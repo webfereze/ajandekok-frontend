@@ -1,19 +1,15 @@
 import React from 'react';
 import HeaderAdmin from "@/pages/admin/components/HeaderAdmin";
-import Orders from "@/pages/admin/components/Orders";
+import CanvasDetails from "@/pages/admin/components/CanvasDetails";
 
 
-export default function Dashboard() {
-
-
+export default function Canvas() {
     return (
         <div className="min-h-screen bg-surface">
             <HeaderAdmin/>
             <div className="container mx-auto">
-                <div className="py-10">
-                    <h1 className="text-left text-3xl text-secondary">Dashboard</h1>
-                </div>
-                <Orders/>
+
+                <CanvasDetails/>
             </div>
         </div>
     );
