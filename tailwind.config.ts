@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         primary: "#CE311A",
         surface: "#F5F5F5",
+        background: "#F5F5F5",
         secondary: "#222222",
         error: "#E30613",
         mediumGrey: "#333333",

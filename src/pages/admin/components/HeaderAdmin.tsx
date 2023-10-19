@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import LogoImage from "@/assets/img/logo.png";
 import React from "react";
-import CartIcon from "@/assets/svg/cart.svg"
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import {logout} from "@/userManagement/userSlice";

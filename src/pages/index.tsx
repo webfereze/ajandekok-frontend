@@ -1,30 +1,33 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import LogoImage from "@/assets/img/logo.png";
 import React from "react";
-import CartIcon from "@/assets/svg/cart.svg"
-
-const inter = Inter({ subsets: ['latin'] })
+import HeaderUser from "@/pages/components/HeaderUser";
+import PhotoOrder from "@/pages/components/PhotoOrder";
 
 export default function Home() {
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between bg-surface `}
+      className={`min-h-screen bg-white `}
     >
-     <header className="w-full py-3 bg-surface shadow-md bg-blend-darken">
-         <div className="container mx-auto">
-             <div className="flex items-center justify-between">
-                 <Image width={180} src={LogoImage} alt="Ajandekok.ro | Logo"/>
-                 <div>
-                     <div className="flex items-center ">
-                         <span className="text-secondary mr-2 text-sm">Order</span>
-                         <Image width={25} src={CartIcon} alt="Ajandekok.ro | Logo"/>
-                     </div>
+      <HeaderUser/>
 
-                 </div>
-             </div>
-         </div>
-     </header>
+      <div className="container mx-auto">
+        <div className="text-secondary relative my-5 flex mx-auto sm:w-1/2 md:1/3 lg:1/4 justify-between steps-border">
+          <div className="text-center flex flex-col">
+            <span className="w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer bg-surface z-[1]">1</span>
+             <p className="text-sm font-semibold mt-1">Add photos</p>
+          </div>
+          <div className="text-center flex flex-col">
+            <span className="w-8 h-8 mx-auto flex items-center justify-center border-primary border-2 rounded-full cursor-pointer bg-surface z-[1]">2</span>
+            <p className="text-sm font-semibold mt-1">Configure</p>
+          </div>
+          <div className="text-center flex flex-col">
+            <span className="w-8 h-8 mx-auto flex items-center justify-center border-primary border-2 rounded-full cursor-pointer bg-surface z-[1]">3</span>
+            <p className="text-sm font-semibold mt-1">Place order</p>
+          </div>
+        </div>
+      </div>
+
+      <PhotoOrder/>
+
     </main>
   )
 }
