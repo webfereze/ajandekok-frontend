@@ -47,14 +47,35 @@ export default function PhotoOrder() {
     } = useForm<FormData>();
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
+        const formData = new FormData();
+        formData.append('first_name', data.first_name);
+        formData.append('last_name', data.last_name);
+        formData.append('email', data.email);
+        formData.append('zip_code', data.zip_code);
+        formData.append('address', data.address);
+        formData.append('country', data.country);
+        formData.append('city', data.city);
+        formData.append('phone', data.phone);
 
-        const submitData = {...data, images:imageFields};
-        console.log(submitData)
+        imageFields.forEach((image, index) => {
+            if (image.file) {
+                const imageKey = `images[${index}]`;
+                const { file, dimensions, quantity } = image;
+                formData.append(`${imageKey}[file]`, file);
+                formData.append(`${imageKey}[dimensions]`, dimensions);
+                formData.append(`${imageKey}[quantity]`, quantity);
+                formData.append(`${imageKey}[paper_type]`, 'soon');
+            }
+        });
+
+        console.log(formData);
+        console.log(imageFields);
 
         try {
-            const response = await axios.post('https://www.ajandekok.fereze.com/api/orders', submitData, {
+            const response = await axios.post('https://www.ajandekok.fereze.com/api/orders', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
                 },
             });
             toast.success("Comanda ta a fost plasata, vom reveni in curand.");
