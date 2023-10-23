@@ -4,15 +4,16 @@ import GalleryIcon from "@/assets/svg/gallery.svg"
 import Image from "next/image";
 import toast, {Toaster} from "react-hot-toast";
 import {TrashIcon, PencilSquareIcon, PlusIcon} from '@heroicons/react/24/outline'
-import BillingData, {FormData} from "@/pages/components/BillingData";
 import {SubmitHandler, useForm} from "react-hook-form";
+import {useSelector} from "react-redux";
 
 interface ImageField {
     file: File | null;
-    dimensions: string | null;
+    dimensions: number;
     quantity: number;
     previewURL: string | null;
     error: string;
+    id?:number;
 }
 
 interface CurrentStep {
@@ -20,33 +21,47 @@ interface CurrentStep {
 }
 
 export interface FormData {
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
+    terms: boolean;
     email: string;
-    street: string;
+    address: string;
     country: string;
     city: string;
-    postalCode: string;
+    zip_code: string;
     phone: string;
     shippingOption: string;
 }
 
 export default function PhotoOrder() {
     const apiUrl = 'https://www.ajandekok.fereze.com/api/canvas';
-    const [availableDimensions, setAvailableDimensions] = useState([]);
+    const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number }[]>([]);
     const [currentStep, setCurrentStep] = useState<CurrentStep>({step: 3});
-    const [orderDetails, setOrderDetails] = useState<[]>([]);
-    const [checkoutPossible, setCheckoutPossible] = useState<boolean>(false);
 
-
+    const user = useSelector((state: any) => state.user);
+    const {token} = user;
     const {
         register,
         handleSubmit,
         formState: {errors},
     } = useForm<FormData>();
 
-    const onSubmit: SubmitHandler<FormData> = (data) => {
-        console.log(data);
+    const onSubmit: SubmitHandler<FormData> = async (data) => {
+
+        const submitData = {...data, images:imageFields};
+        console.log(submitData)
+
+        try {
+            const response = await axios.post('https://www.ajandekok.fereze.com/api/orders', submitData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            toast.success("Comanda ta a fost plasata, vom reveni in curand.");
+           console.log(response.data);
+        } catch (error) {
+            toast.success("Error processing your request.");
+        }
     };
 
     const fetchData = async () => {
@@ -68,9 +83,10 @@ export default function PhotoOrder() {
 
     // Function to add a new image field
     const addImageField = () => {
+
         const newImageField: ImageField = {
             file: null,
-            dimensions: availableDimensions[0].dimension,
+            dimensions: availableDimensions[0].id,
             quantity: 1,
             previewURL: null,
             error: '',
@@ -94,7 +110,7 @@ export default function PhotoOrder() {
     };
 
     // Function to handle dimensions selection
-    const handleDimensionsChange = (index: number, dimensions: string) => {
+    const handleDimensionsChange = (index: number, dimensions: number) => {
         const updatedFields = [...imageFields];
         updatedFields[index].dimensions = dimensions;
         setImageFields(updatedFields);
@@ -118,7 +134,7 @@ export default function PhotoOrder() {
     // Function to calculate the total price
     const calculateTotalPrice = () => {
         const price = imageFields.reduce((total, field) => {
-            const selectedDimension = availableDimensions.find((dim: any) => dim.dimension === field.dimensions);
+            const selectedDimension = availableDimensions.find((dim: any) => dim.id == field.dimensions);
             if (selectedDimension) {
                 return total + field.quantity * (selectedDimension as { dimension: string; price: number }).price;
             }
@@ -127,6 +143,10 @@ export default function PhotoOrder() {
 
         setTotalPrice(price);
     };
+    const returnDimensionNameById = (id:number) => {
+        const selectedDimension = availableDimensions.find((dim: any) => dim.id == id);
+        return selectedDimension?.dimension
+    }
 
     const increaseQuantity = (index: number) => {
         const updatedFields = [...imageFields];
@@ -143,9 +163,9 @@ export default function PhotoOrder() {
         }
     };
 
-    const calculateFieldPrice = (dimension: string, quantity: number): number | undefined => {
+    const calculateFieldPrice = (id: number, quantity: number): number | undefined => {
         if (availableDimensions) {
-            const matchingObject = availableDimensions?.find((item: { dimension:string, price:number }) => item.dimension === dimension);
+            const matchingObject = availableDimensions?.find((item: { id:number, price:number }) => item.id == id);
             if (matchingObject) {
                 return matchingObject?.price * quantity;
             } else {
@@ -156,7 +176,6 @@ export default function PhotoOrder() {
 
     useEffect(() => {
         calculateTotalPrice();
-        console.log(imageFields);
         if (imageFields.length == 0) {
             setCurrentStep({step: 1});
         } else {
@@ -173,23 +192,12 @@ export default function PhotoOrder() {
                 error: field.file ? '' : 'File is required',
             }));
             setImageFields(updatedFields);
-            console.log('File is required for all fields.');
             toast.error("Some fields are required");
         } else {
             calculateTotalPrice();
             setCurrentStep({step: 3});
-            console.log('Submitted data:', imageFields);
         }
     }
-
-    const [formData, setFormData] = useState<FormData | null>(null);
-
-    // Function to receive form data from the child component
-    const handleFormData = (data: FormData) => {
-        setFormData(data);
-        console.log(data);
-    };
-
 
     return (
 
@@ -240,11 +248,8 @@ export default function PhotoOrder() {
                                 <p>Price</p>
                             </div>
                             <hr className="border-b my-5"/>
-                            {availableDimensions && availableDimensions.map((item: {
-                                dimension: string;
-                                price: number
-                            }) => (
-                                <div className="grid grid-cols-2 gap-4 text-secondary" key={item.dimension}>
+                            {availableDimensions && availableDimensions.map((item: { id:number; dimension:string;price:number }) => (
+                                <div className="grid grid-cols-2 gap-4 text-secondary" key={item.id}>
                                     <p className="text-left">{item.dimension}</p>
                                     <p>{item.price} RON</p>
                                 </div>
@@ -259,7 +264,7 @@ export default function PhotoOrder() {
                 <div className="container mx-auto">
                     <h1 className="text-3xl text-secondary text-center my-5 font-bold ">Configure your options</h1>
                     <div className="block md:grid grid-cols-3 lg:grid-cols-4 gap-4 mt-10 mb-20">
-                        {imageFields.map((field, index) => (
+                        {imageFields.map((field:any, index) => (
                             <div key={index}
                                  className="relative bg-background rounded-xl mb-10 border border-y-4 py-5 px-5 cursor-pointer text-center text-secondary flex flex-col justify-between">
                                 <div>
@@ -296,12 +301,12 @@ export default function PhotoOrder() {
                                     <div>
                                         <p className="text-center text-sm mb-1">Dimension</p>
                                         <select
-                                            value={field.dimensions as string}
-                                            onChange={(e) => handleDimensionsChange(index, e.target.value)}
+                                            value={field.id}
+                                            onChange={(e) => handleDimensionsChange(index, parseInt(e.target.value))}
                                             className="border p-1 border-secondary rounded-md pl-3 w-1/2 mx-auto text-center"
                                         >
-                                            {availableDimensions.map((dim: { dimension: string }, dimIndex) => (
-                                                <option key={dimIndex} value={dim.dimension}>
+                                            {availableDimensions.map((dim: { dimension: string, id:number }, dimIndex) => (
+                                                <option key={dimIndex} value={dim.id}>
                                                     {dim.dimension}
                                                 </option>
                                             ))}
@@ -389,7 +394,8 @@ export default function PhotoOrder() {
 
                         </div>
                     </div>
-                </div>}
+                </div>
+            }
 
             {currentStep.step === 3 && imageFields.length > 0 && <div className="text-secondary">
                 <div className="bg-background">
@@ -400,7 +406,174 @@ export default function PhotoOrder() {
                                 <div className="py-10 px-5 rounded-md bg-white shadow-md text-secondary">
 
                                     <h3 className="font-bold text-sm mb-5 text-secondary">Billing details</h3>
-                                    <BillingData onFormSubmit={handleFormData}/>
+                                    <form onSubmit={handleSubmit(onSubmit)} >
+                                        <div>
+                                            <div className="grid grid-cols-2 gap-3 mb-7">
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        id="first_name"
+                                                        placeholder="First Name"
+                                                        {...register('first_name', {required: 'First Name is required'})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.first_name && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.first_name.message}</p>}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        id="last_name"
+                                                        placeholder="Last Name"
+                                                        {...register('last_name', {required: 'Last Name is required'})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.last_name && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.last_name.message}</p>}
+                                                </div>
+                                            </div>
+
+                                            <div className="relative mb-7">
+                                                <input
+                                                    type="email"
+                                                    id="email"
+                                                    placeholder="Email"
+                                                    {...register('email', {
+                                                        required: 'Email is required',
+                                                        pattern: {
+                                                            value: /\S+@\S+\.\S+/,
+                                                            message: 'Invalid email format',
+                                                        },
+                                                    })}
+                                                    className="border border-gray-300 rounded p-2 w-full"
+                                                />
+                                                {errors.email && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.email.message}</p>}
+                                            </div>
+
+                                            <div className="relative mb-7">
+                                                <input
+                                                    type="text"
+                                                    id="address"
+                                                    placeholder="Address"
+                                                    {...register('address', {required: 'address is required'})}
+                                                    className="border border-gray-300 rounded p-2 w-full"
+                                                />
+                                                {errors.address && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.address.message}</p>}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3 mb-7">
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        id="country"
+                                                        placeholder="Country"
+                                                        {...register('country', {required: 'Country is required'})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.country && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.country.message}</p>}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        id="city"
+                                                        placeholder="City"
+                                                        {...register('city', {required: 'City is required'})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.city && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.city.message}</p>}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3 mb-7">
+
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        id="zip_code"
+                                                        placeholder="Postal Code"
+                                                        {...register('zip_code', {required: 'Postal Code is required'})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.zip_code && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.zip_code.message}</p>}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <input
+                                                        type="tel"
+                                                        id="phone"
+                                                        placeholder="Phone (e.g., 07xx-xxx-xxx)"
+                                                        {...register('phone', {
+                                                            required: 'Phone is required',
+                                                            pattern: {
+                                                                value: /^(0[2347][0-9]{2}[-. ]?[0-9]{3}[-. ]?[0-9]{3}|0[56][0-9]{8})$/,
+                                                                message: 'Invalid format (e.g., XXXX XXX XXX)',
+                                                            },
+                                                        })}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.phone && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.phone.message}</p>}
+                                                </div>
+                                            </div>
+
+                                            <div className="relative">
+                                                <label>Shipping Option</label>
+                                                <div className="relative text-secondary">
+                                                    <label>
+                                                        <input
+                                                            type="radio"
+                                                            checked={true}
+                                                            name="shippingOption"
+                                                            value="Sepsi"
+                                                            {...register('shippingOption', {required: 'Shipping Option is required'})}
+                                                        />
+                                                        Sepsi
+                                                    </label>
+                                                    <label>
+                                                        <input
+                                                            type="radio"
+                                                            name="shippingOption"
+                                                            value="Another"
+                                                            {...register('shippingOption', {required: 'Shipping Option is required'})}
+                                                        />
+                                                        Another
+                                                    </label>
+                                                </div>
+                                                {errors.shippingOption && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.shippingOption.message}</p>}
+                                            </div>
+
+                                            <div className="relative">
+                                                <div className="relative text-secondary">
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            {...register('terms', {required: 'Please accept terms and conditions'})}
+                                                        />
+                                                       Sunt de acord cu termenii si conditiile
+                                                    </label>
+
+                                                </div>
+                                                {errors.terms && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.terms.message}</p>}
+                                            </div>
+                                        </div>
+
+                                        {currentStep.step === 3 && <>
+                                            <div
+                                                className="flex opacity-100 bg-background border-t shadow-md py-5 fixed left-0 right-0 bottom-0 justify-between text-right px-10">
+                                                <div className="text-secondary text-left">
+                                                    <p>Finalizare comanda</p>
+                                                    <div>
+                                                        Total Price: <strong>RON: {totalPrice.toFixed(2)}</strong>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" className="font-semibold text-white bg-primary inline-block py-4 rounded-full px-5 text-sm">
+                                                    Trimite comanda
+                                                </button>
+                                            </div>
+                                        </>
+                                        }
+
+
+                                    </form>
                                 </div>
 
                             </div>
@@ -409,7 +582,7 @@ export default function PhotoOrder() {
                             <div className="col-span-2">
 
 
-                                <div className="py-10 px-5 rounded-md bg-white shadow-md text-secondary">
+                                <div className="py-5 px-5 rounded-md bg-white shadow-md text-secondary">
                                     <div className="flex items-center justify-between pb-5 border-b">
                                         <div>
                                             <h3 className="font-bold flex items-center justify-between">Order summary</h3>
@@ -419,7 +592,7 @@ export default function PhotoOrder() {
                                     </div>
 
                                     <div>
-                                        {imageFields.map((field, index) => (
+                                        {imageFields.map((field:any, index) => (
                                             <div className="flex items-center justify-start" key={index}>
                                                 {field.previewURL && (
                                                     <div className="relative">
@@ -433,30 +606,24 @@ export default function PhotoOrder() {
                                                     </div>
                                                 )}
                                                 <div className="pl-5 text-sm">
-                                                    {field.dimensions}
-                                                    {field.quantity}
+                                                    {returnDimensionNameById(field.dimensions)}
                                                     <div className="text-secondary text-sm">
-                                                        price: <strong>{calculateFieldPrice(field.dimensions, field.quantity)} RON</strong>
+                                                        Cantitate: {field.quantity}
+                                                    </div>
+                                                    <div className="text-secondary text-sm">
+                                                        Pret: <strong>{calculateFieldPrice(field.dimensions, field.quantity)} RON</strong>
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
 
-                                    <div className="grid grid-cols-2 pt-10 border-t">
+                                    <div className="grid grid-cols-2 py-10 border-t border-b">
                                         <div className="text-left font-bold">Total</div>
                                         <div className="text-right font-bold">{totalPrice.toFixed(2)} RON</div>
                                     </div>
-                                    <div className="text-center">
 
-                                        <div
-                                            className={`${!checkoutPossible ? 'pointer-events-none opacity-50' : ''} font-semibold bg-primary inline-block text-white py-3 mt-5 rounded-full px-5 text-sm`}>Check
-                                            out
-                                        </div>
-                                        {!checkoutPossible &&
-                                            <p className="text-xs mt-5">Make sure you have completed all the datas for the complete checkout</p>
-                                        }
-                                    </div>
+                                    <p className="text-xs pt-10">Daca ai intrebari sau alte opinii te rog sa ne scrii un email la <strong>office@ajandekok.ro</strong> si iti vom raspunde cu cel mai mare drag. Te mai asteptam.</p>
                                 </div>
                             </div>
 
