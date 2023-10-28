@@ -2,6 +2,7 @@ import Image from 'next/image'
 import LogoImage from "@/assets/img/logo.png";
 import React from "react";
 import {ShoppingCartIcon, HomeIcon, Bars3BottomRightIcon} from '@heroicons/react/24/outline'
+import Link from "next/link";
 
 export default function HeaderUser() {
 
@@ -10,7 +11,9 @@ export default function HeaderUser() {
       <header className="w-full py-3 bg-white shadow-md ">
           <div className="container mx-auto">
               <div className="flex items-center justify-between">
-                  <Image width={180} src={LogoImage} alt="Ajandekok.ro | Logo"/>
+                  <a href="/">
+                      <Image width={180} src={LogoImage} alt="Ajandekok.ro | Logo"/>
+                  </a>
                   <div className="flex items-center justify-center">
                       <div className="block md:hidden">
                           <Bars3BottomRightIcon className="w-8 h-8 text-primary"/>

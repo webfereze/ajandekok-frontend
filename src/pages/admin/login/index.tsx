@@ -35,7 +35,6 @@ export default function Login() {
             // Handle the API response, e.g., store user data or display a success message
             console.log('API Response:', response.data);
             if (response.status === 201) {
-
                 dispatch(setUser(response.data));
                 router.push('/admin/dashboard');
             } else {
