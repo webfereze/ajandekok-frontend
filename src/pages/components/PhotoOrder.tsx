@@ -3,10 +3,9 @@ import axios from "axios";
 import GalleryIcon from "@/assets/svg/gallery.svg"
 import Image from "next/image";
 import toast, {Toaster} from "react-hot-toast";
-import {TrashIcon, PencilSquareIcon, PlusIcon, EnvelopeIcon} from '@heroicons/react/24/outline'
+import {TrashIcon, PencilSquareIcon, PlusIcon} from '@heroicons/react/24/outline'
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
-import HeroImage from "@/assets/img/order-img.jpg";
 import HeroImage2 from "@/assets/img/order-img-2.jpg";
 
 interface ImageField {
@@ -33,6 +32,11 @@ export interface FormData {
     zip_code: string;
     phone: string;
     shippingOption: string;
+}
+
+export interface AdminFormData {
+    email: string;
+    password: string;
 }
 
 export default function PhotoOrder() {
@@ -64,14 +68,13 @@ export default function PhotoOrder() {
                 const imageKey = `images[${index}]`;
                 const { file, dimensions, quantity } = image;
                 formData.append(`${imageKey}[file]`, file);
+                // @ts-ignore
                 formData.append(`${imageKey}[dimensions]`, dimensions);
+                // @ts-ignore
                 formData.append(`${imageKey}[quantity]`, quantity);
                 formData.append(`${imageKey}[paper_type]`, 'soon');
             }
         });
-
-        console.log(formData);
-        console.log(imageFields);
 
         try {
             const response = await axios.post('https://www.ajandekok.fereze.com/api/orders', formData, {
@@ -82,9 +85,8 @@ export default function PhotoOrder() {
             });
             toast.success("Comanda ta a fost plasata, vom reveni in curand.");
            console.log(response.data);
-           window.location.reload();
         } catch (error) {
-            toast.success("Error processing your request.");
+            toast.error("Error processing your request.");
         }
     };
 
@@ -125,7 +127,7 @@ export default function PhotoOrder() {
         updatedFields[index].error = '';
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = (e:any) => {
                 updatedFields[index].previewURL = e.target ? e.target.result as string : '';
                 setImageFields(updatedFields);
             };
@@ -232,6 +234,7 @@ export default function PhotoOrder() {
         }
     };
 
+    // @ts-ignore
     return (
 
         <>
@@ -406,10 +409,8 @@ export default function PhotoOrder() {
                                         {field.previewURL && (
                                             <button
                                                 onClick={() => fileInputRefs.current[index]?.click()}
-                                                className="cursor-pointer flex items-center justify-center bg-gray-400 w-full h-full py-3 text-white uppercase text-center border-r"
-                                            >
+                                                className="cursor-pointer flex items-center justify-center bg-gray-400 w-full h-full py-3 text-white uppercase text-center border-r">
                                                 <PencilSquareIcon className="w-5 h-5 text-white"/>
-
                                             </button>)}
                                         <button
                                             onClick={() => removeImageField(index)}
@@ -434,17 +435,17 @@ export default function PhotoOrder() {
                             <div className="relative mb-10 flex mx-auto cursor-pointer text-center">
                                 <PlusIcon className="w-20 h-20 text-primary mx-auto"/>
                             </div>
-                            <p className="text-secondary text-sm text-center">Let's add another one!</p>
+                            <p className="text-secondary text-sm text-center">Lets add another one!</p>
                             <p className="text-lightGrey text-xs py-2">This box helps you to create a configurations based on your desire.
                                 If you want to add a new one, just click <strong>here</strong>
                             </p>
                             <p className="text-lightGrey text-xs py-2">Also <strong>discounts</strong> are apllied. </p>
                             <div className="text-xs">
-                                <div>>50db - 10%</div>
-                                <div>>100db - 20%</div>
-                                <div>>200db - 30%</div>
-                                <div>>400db - 40%</div>
-                                <div>>500db - 50%</div>
+                                <div>+50db - 10%</div>
+                                <div>+100db - 20%</div>
+                                <div>+200db - 30%</div>
+                                <div>+400db - 40%</div>
+                                <div>+500db - 50%</div>
                             </div>
                             <div>
                                 <div
@@ -591,6 +592,7 @@ export default function PhotoOrder() {
                                                             type="radio"
                                                             checked={true}
                                                             className="mr-2"
+                                                            // @ts-ignore
                                                             name="shippingOption"
                                                             value="personal"
                                                             {...register('shippingOption', {required: 'Shipping Option is required'})}
@@ -602,6 +604,7 @@ export default function PhotoOrder() {
                                                         <input
                                                             type="radio"
                                                             className="mr-2"
+                                                            // @ts-ignore
                                                             name="shippingOption"
                                                             value="courier"
                                                             {...register('shippingOption', {required: 'Shipping Option is required'})}
@@ -620,7 +623,7 @@ export default function PhotoOrder() {
                                                             type="checkbox"
                                                             {...register('terms', {required: 'Please accept terms and conditions'})}
                                                         />
-                                                        <span className="font-light">Sunt de acord cu termenii si conditiile ale paginii de <a className="font-semibold text-primary underline" href="https://ajandekok.ro/termeni-si-conditii/">aici</a>. </span>
+                                                        <span className="font-light">Sunt de acord cu termenii si conditiile ale paginii de <a className="font-semibold text-primary underline" href="https://ajandekok.ro/termeni-si-conditii">aici</a>. </span>
                                                     </label>
 
                                                 </div>

@@ -31,7 +31,7 @@ const ImageRepeater: React.FC = () => {
         updatedFields[index].error = file ? '' : 'File is required';
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = (e:any) => {
                 updatedFields[index].previewURL = e.target.result as string;
                 setImageFields(updatedFields);
             };
