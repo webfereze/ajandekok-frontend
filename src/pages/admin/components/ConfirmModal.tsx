@@ -33,7 +33,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, onConfirm 
                                         <button onClick={onConfirm} className="bg-green-700 text-white px-5 py-2 rounded-md m-2">
                                             Yes
                                         </button>
-                                        <button onClick={onConfirm} className="bg-error text-white px-5 py-2 rounded-md m-2">
+                                        <button onClick={onClose} className="bg-error text-white px-5 py-2 rounded-md m-2">
                                             No
                                         </button>
                                     </div>

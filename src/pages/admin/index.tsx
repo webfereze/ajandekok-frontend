@@ -67,6 +67,7 @@ export default function Dashboard() {
     };
 
     const handleConfirmCloseModal = () => {
+        console.log("close");
         setConfirmModalOpen(false);
         setSelectedOrderId(null);
     };
