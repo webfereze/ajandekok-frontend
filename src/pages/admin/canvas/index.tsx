@@ -8,7 +8,6 @@ export default function Canvas() {
         <div className="min-h-screen bg-surface">
             <HeaderAdmin/>
             <div className="container mx-auto">
-
                 <CanvasDetails/>
             </div>
         </div>

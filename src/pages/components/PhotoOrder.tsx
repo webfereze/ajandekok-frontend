@@ -7,6 +7,7 @@ import {TrashIcon, PencilSquareIcon, PlusIcon} from '@heroicons/react/24/outline
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
 import HeroImage2 from "@/assets/img/order-img-2.jpg";
+import {Router, useRouter} from "next/router";
 
 interface ImageField {
     file: File | null;
@@ -43,6 +44,7 @@ export default function PhotoOrder() {
     const apiUrl = 'https://www.ajandekok.fereze.com/api/canvas';
     const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number }[]>([]);
     const [currentStep, setCurrentStep] = useState<CurrentStep>({step: 1});
+    const router = useRouter()
 
     const user = useSelector((state: any) => state.user);
     const {token} = user;
@@ -84,7 +86,7 @@ export default function PhotoOrder() {
                 },
             });
             toast.success("Comanda ta a fost plasata, vom reveni in curand.");
-           console.log(response.data);
+            await router.push('/thankyou');
         } catch (error) {
             toast.error("Error processing your request.");
         }
@@ -651,7 +653,7 @@ export default function PhotoOrder() {
 
                                     <div>
                                         {imageFields.map((field:any, index) => (
-                                            <div className="flex items-center justify-start" key={index}>
+                                            <div className="flex items-center justify-start mb-4" key={index}>
                                                 {field.previewURL && (
                                                     <div className="relative">
                                                         <Image

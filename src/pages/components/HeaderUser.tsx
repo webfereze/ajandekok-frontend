@@ -19,14 +19,14 @@ export default function HeaderUser() {
                           <Bars3BottomRightIcon className="w-8 h-8 text-primary"/>
                       </div>
                       <div className="hidden md:flex">
-                          <div className="flex items-center px-2">
+                          <Link className="flex items-center px-2" href="/">
                               <ShoppingCartIcon className="w-6 h-6 text-primary mr-1"/>
                               <span className="text-secondary mr-2 text-sm font-semibold">Order</span>
-                          </div>
-                          <div className="flex items-center px-2">
+                          </Link>
+                          <Link className="flex items-center px-2" href="https://ajandekok.ro/#contact">
                               <HomeIcon className="w-6 h-6 text-primary mr-1"/>
                               <span className="text-secondary mr-2 text-sm font-semibold">Contact</span>
-                          </div>
+                          </Link>
                       </div>
                   </div>
               </div>

@@ -23,10 +23,9 @@ export default function Login() {
     const onSubmit = async (data:any) => {
         try {
             const response = await axios.post('https://www.ajandekok.fereze.com/api/login', data);
-            console.log('API Response:', response.data);
             if (response.status === 201) {
                 dispatch(setUser(response.data));
-                router.push('/admin/dashboard');
+                router.push('/admin');
             } else {
                 toast.error("Something went bad.")
             }

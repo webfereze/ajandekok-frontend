@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axios from "axios";
-import {useDispatch, useSelector} from "react-redux";
-import {useRouter} from "next/router";
+import { useSelector} from "react-redux";
 import {PencilIcon, MinusCircleIcon} from '@heroicons/react/24/solid'
 import {MinusIcon} from "@heroicons/react/20/solid";
 
@@ -13,29 +12,25 @@ interface Product {
 
 export default function CanvasDetails() {
     const [products, setProducts] = useState([]);
-    const dispatch = useDispatch();
-    const router = useRouter();
     const user = useSelector((state: any) => state.user);
     const {token} = user;
     const apiUrl = 'https://www.ajandekok.fereze.com/api/canvas';
-
     const [newProduct, setNewProduct] = useState({dimension: '', price: 0});
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const response = await axios.get(apiUrl, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(response.data)
-            setProducts(response.data)
+            setProducts(response.data);
         } catch (error) {
             console.error('Error:', error);
         }
-    };
+    }, [apiUrl, token]);
 
     useEffect(() => {
         fetchData();
@@ -51,13 +46,12 @@ export default function CanvasDetails() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(response.data)
+            setProducts(response.data);
         } catch (error) {
             console.error('Error:', error);
         }
     };
     const handleSave = async () => {
-        console.log(newProduct)
         const data = [];
         data.push(newProduct)
         try {
