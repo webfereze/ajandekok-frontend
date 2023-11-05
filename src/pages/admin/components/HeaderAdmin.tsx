@@ -26,10 +26,6 @@ export default function HeaderAdmin() {
                  <Link href="/admin">
                      <Image width={180} src={LogoImage} alt="Ajandekok.ro | Logo"/>
                  </Link>
-                 <div className="text-secondary">
-                     <h1>{t('welcome')}</h1>
-                     <p>{t('greeting', { name: 'John' })}</p>
-                 </div>
 
                  <div>
                      <div className="flex items-center text-secondary">

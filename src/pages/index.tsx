@@ -14,12 +14,6 @@ export default function Home() {
       className={`min-h-screen bg-white`}
     >
       <HeaderUser/>
-      <div className="text-secondary">
-        <LanguageSwitcher />
-        <h1>{t('hello')}</h1>
-        <p>{t('welcome')}</p>
-        <p>{t('language')}</p>
-      </div>
       <PhotoOrder/>
       <Footer/>
     </main>

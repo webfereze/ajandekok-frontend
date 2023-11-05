@@ -89,8 +89,9 @@ export default function Dashboard() {
 
             <div className="container mx-auto">
                 <div className="py-10 text-secondary">
-                    <div className="grid grid-cols-7 rounded-t-md bg-secondary text-white py-2 text-xs">
+                    <div className="grid grid-cols-8 rounded-t-md bg-secondary text-white py-2 text-xs">
                         <div className="text-center">Order ID</div>
+                        <div className="text-center">Shipping</div>
                         <div className="px-2">Name</div>
                         <div className="px-2">Email</div>
                         <div className="px-2">Phone</div>
@@ -101,8 +102,9 @@ export default function Dashboard() {
 
                     {orders.map((order:any) => (
                         <>
-                            <div className="grid grid-cols-7 bg-white border-b items-center text-xs py-2" key={order.id}>
+                            <div className="grid grid-cols-8 bg-white border-b items-center text-xs py-2" key={order.id}>
                                 <div className="text-center">{order.id}</div>
+                                <div className="text-center bg-indigo-500 px-1 py-0.5 inline-block text-white rounded-sm">{order.shipping}</div>
                                 <div className="px-2">{order.first_name} {order.last_name}</div>
                                 <div className="px-2 break-all">{order.email}</div>
                                 <div className="px-2">{order.phone}</div>

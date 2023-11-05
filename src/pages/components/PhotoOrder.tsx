@@ -8,6 +8,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
 import HeroImage2 from "@/assets/img/order-img-2.jpg";
 import {Router, useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 interface ImageField {
     file: File | null;
@@ -32,7 +33,8 @@ export interface FormData {
     city: string;
     zip_code: string;
     phone: string;
-    shippingOption: string;
+    details: string;
+    shipping: string;
 }
 
 export interface AdminFormData {
@@ -45,6 +47,7 @@ export default function PhotoOrder() {
     const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number }[]>([]);
     const [currentStep, setCurrentStep] = useState<CurrentStep>({step: 1});
     const router = useRouter()
+    const { t } = useTranslation();
 
     const user = useSelector((state: any) => state.user);
     const {token} = user;
@@ -64,6 +67,8 @@ export default function PhotoOrder() {
         formData.append('country', data.country);
         formData.append('city', data.city);
         formData.append('phone', data.phone);
+        formData.append('shipping', data.shipping);
+        formData.append('details', data.details);
 
         imageFields.forEach((image, index) => {
             if (image.file) {
@@ -85,7 +90,6 @@ export default function PhotoOrder() {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            toast.success("Comanda ta a fost plasata, vom reveni in curand.");
             await router.push('/thankyou');
         } catch (error) {
             toast.error("Error processing your request.");
@@ -220,7 +224,7 @@ export default function PhotoOrder() {
                 error: field.file ? '' : 'File is required',
             }));
             setImageFields(updatedFields);
-            toast.error("Some fields are required");
+            toast.error(t('global.fields.required'));
         } else {
             calculateTotalPrice();
             setCurrentStep({step: 3});
@@ -240,7 +244,7 @@ export default function PhotoOrder() {
     return (
 
         <>
-            <Toaster/>
+            <Toaster position="top-right"/>
             <div className="container px-2 mx-auto my-10">
                 <div
                     onClick={()=>setCurrentStep({step:1})}
@@ -248,18 +252,20 @@ export default function PhotoOrder() {
                     <div className="text-center flex flex-col">
                         <span
                             className={`text-white bg-primary  w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>1</span>
-                        <p className="text-sm text-secondary font-semibold mt-1">Add photos</p>
+                        <p className="text-sm text-secondary font-semibold mt-1">{t('global.step.1')}</p>
                     </div>
                     <div className="text-center flex flex-col" onClick={addImageField}>
                         <span
                             className={`${currentStep.step > 1 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>2</span>
-                        <p className="text-sm text-secondary font-semibold mt-1">Configure</p>
+                        <p className="text-sm text-secondary font-semibold mt-1">{t('global.step.2')}</p>
                     </div>
                     <div className="text-center flex flex-col">
                         <span
                             className={`${currentStep.step > 2 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>3</span>
-                        <p className="text-sm text-secondary font-semibold mt-1">Place order</p>
+                        <p className="text-sm text-secondary font-semibold mt-1">{t('global.step.3')}</p>
                     </div>
+
+
                 </div>
             </div>
 
@@ -271,19 +277,21 @@ export default function PhotoOrder() {
                         <Image alt="Ajandekok.ro | Order page" className="rounded-md" src={HeroImage2}/>
                     </div>
                     <div className="p-10 text-secondary">
-                        <h1 className="text-left text-4xl font-bold ">Prémium fotóelőhívás,</h1>
+                        <h1 className="text-left text-4xl font-bold ">
+                            {t('hero.title')}</h1>
                         <span className="text-xs block">Part of <a href="https://www.ajandekok.ro" className="text-primary font-semibold">ajandekok.ro</a> KolPicShop.</span>
 
-                        <p className="py-5 text-md"> hogy újra átélhesd az emlékezetes pillanatokat!
-                        Töltsd fel a mobiltelefonnal vagy fényképezőgéppel készített fotóidat és mi digitális fotókidolgozással időtálló minőségben, élethű színekkel előhívjuk azokat!
+                        <p className="py-5 text-md">
+                            {t('hero.copyright')}
+                            {t('hero.description')}
                         </p>
                         <p className="text-md">
-                            Akár képkeretbe vagy fényképalbumba rendezve örök emlék az egész család számára!
+                            {t('hero.description.2')}
                         </p>
                         <div
                             onClick={addImageField} role="presentation"
                             className="bg-primary inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
-                            Kiprobalom
+                            {t('button.try')}
                         </div>
                         </div>
                 </div>
@@ -293,25 +301,26 @@ export default function PhotoOrder() {
 
             {currentStep.step === 1 &&
                 <div className="container px-2 mx-auto my-10">
-                    <h1 className="text-center text-secondary text-4xl font-bold mb-10">Photo order</h1>
+                    <h1 className="text-center text-secondary text-4xl font-bold mb-10">{t('global.photo.order.text')}</h1>
                     <div className="bg-background block md:grid grid-cols-3 p-10 w-full rounded-xl">
                         <div className="bg-background col-span-2 rounded-xl py-5 px-5 cursor-pointer text-center">
                             <Image className="mx-auto" src={GalleryIcon} alt="Ajandekok.ro | Gallery"/>
-                            <p className="text-secondary text-sm pt-5 text-center">Click on button to configure
-                                photo</p>
+                            <p className="text-secondary text-sm pt-5 text-center">
+                                {t('descriptive.text.click.to.configure')}
+                            </p>
                             <p className="text-lightGrey text-xs py-2">JPG/TIF, min 700x700 px, max 3000x3000 px,
-                                max 2GB</p>
+                                max 2MB</p>
                             <div
                                 onClick={addImageField} role="presentation"
                                 className="bg-primary inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
-                                Start configuring
+                                {t('descriptive.text.start.configure')}
                             </div>
                         </div>
                         <div className="text-right col-span-1 md:px-10">
-                            <h3 className="text-secondary text-center mb-5 font-bold text-xl">Print prices</h3>
+                            <h3 className="text-secondary text-center mb-5 font-bold text-xl">{t('descriptive.text.prices.title')}</h3>
                             <div className="grid grid-cols-2 gap-4 text-secondary">
-                                <p className="text-left">Dimension</p>
-                                <p>Price</p>
+                                <p className="text-left">{t('descriptive.text.dimensions')}</p>
+                                <p>{t('descriptive.text.price')}</p>
                             </div>
                             <hr className="border-b my-5"/>
                             {availableDimensions && availableDimensions.map((item: { id:number; dimension:string;price:number }) => (
@@ -328,7 +337,7 @@ export default function PhotoOrder() {
 
             {currentStep.step == 2 && imageFields.length > 0 &&
                 <div className="container mx-auto">
-                    <h1 className="text-3xl text-secondary text-center my-5 font-bold ">Configure your options</h1>
+                    <h1 className="text-3xl text-secondary text-center my-5 font-bold ">{t('descriptive.text.click.to.configure')}</h1>
                     <div className="block md:grid grid-cols-3 lg:grid-cols-4 gap-4 mt-10 mb-20">
                         {imageFields.map((field:any, index) => (
                             <div key={index}
@@ -359,13 +368,13 @@ export default function PhotoOrder() {
                                         <div className="relative flex-col w-full h-32 mb-5 flex mx-auto cursor-pointer text-center border-b"
                                              onClick={() => fileInputRefs.current[index]?.click()}>
                                             <Image className="mx-auto" src={GalleryIcon} alt="Ajandekok.ro | Gallery"/>
-                                            <p className="text-center text-sm mt-2">Click <strong>here</strong> to upload </p>
+                                            <p className="text-center text-sm mt-2">{t('descriptive.text.click.here')} </p>
 
                                         </div>)
                                     }
 
                                     <div>
-                                        <p className="text-center text-sm mb-1">Dimension</p>
+                                        <p className="text-center text-sm mb-1">{t('descriptive.text.dimensions')}</p>
                                         <select
                                             value={field.id}
                                             onChange={(e) => handleDimensionsChange(index, parseInt(e.target.value))}
@@ -380,7 +389,7 @@ export default function PhotoOrder() {
                                     </div>
 
                                     <div className="mt-5">
-                                        <p className="text-center text-sm mb-1">Quantity</p>
+                                        <p className="text-center text-sm mb-1">{t('descriptive.text.quantity')}</p>
                                         <div className="flex items-center justify-center mb-5 mx-auto">
                                             <button
                                                 onClick={() => decreaseQuantity(index)}
@@ -422,11 +431,11 @@ export default function PhotoOrder() {
                                         </button>
                                     </div>
                                     <div className="text-secondary my-2 text-sm">
-                                        price: <strong>{calculateFieldPrice(field.dimensions, field.quantity)} RON</strong>
+                                        {t('descriptive.text.price')}: <strong>{calculateFieldPrice(field.dimensions, field.quantity)} RON</strong>
                                     </div>
 
                                     {field.error &&
-                                        <p className="text-error bg-primary text-white text-sm">{field.error}</p>}
+                                        <p className="text-white bg-primary text-sm">{field.error}</p>}
                                 </div>
 
                             </div>
@@ -437,22 +446,21 @@ export default function PhotoOrder() {
                             <div className="relative mb-10 flex mx-auto cursor-pointer text-center">
                                 <PlusIcon className="w-20 h-20 text-primary mx-auto"/>
                             </div>
-                            <p className="text-secondary text-sm text-center">Lets add another one!</p>
-                            <p className="text-lightGrey text-xs py-2">This box helps you to create a configurations based on your desire.
-                                If you want to add a new one, just click <strong>here</strong>
-                            </p>
-                            <p className="text-lightGrey text-xs py-2">Also <strong>discounts</strong> are apllied. </p>
-                            <div className="text-xs">
-                                <div>+50db - 10%</div>
-                                <div>+100db - 20%</div>
-                                <div>+200db - 30%</div>
-                                <div>+400db - 40%</div>
-                                <div>+500db - 50%</div>
-                            </div>
+                            <p className="text-secondary text-sm text-center">{t('descriptive.text.another.one.title')}</p>
+                            <p className="text-lightGrey text-xs py-2">{t('descriptive.text.another.one.desc')}</p>
+
+                            {/*<p className="text-lightGrey text-xs py-2">Also <strong>discounts</strong> are apllied. </p>*/}
+                            {/*<div className="text-xs">*/}
+                            {/*    <div>+50db - 10%</div>*/}
+                            {/*    <div>+100db - 20%</div>*/}
+                            {/*    <div>+200db - 30%</div>*/}
+                            {/*    <div>+400db - 40%</div>*/}
+                            {/*    <div>+500db - 50%</div>*/}
+                            {/*</div>*/}
                             <div>
                                 <div
                                     className="bg-primary inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
-                                    Add configuration
+                                    {t('global.config.add')}
                                 </div>
                             </div>
 
@@ -470,16 +478,16 @@ export default function PhotoOrder() {
                             <div className="col-span-2">
                                 <div className="py-10 px-5 rounded-md bg-white shadow-md text-secondary">
 
-                                    <h3 className="font-bold text-sm mb-5 text-secondary">Billing details</h3>
+                                    <h3 className="font-bold text-sm mb-5 text-secondary"> {t('global.billing.details')}</h3>
                                     <form onSubmit={handleSubmit(onSubmit)} >
                                         <div>
                                             <div className="grid grid-cols-2 gap-3 mb-7">
                                                 <div className="relative">
-                                                    <label htmlFor="first_name" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">First name</label>
+                                                    <label htmlFor="first_name" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.firstname')}</label>
                                                     <input
                                                         type="text"
                                                         id="first_name"
-                                                        {...register('first_name', {required: 'First Name is required'})}
+                                                        {...register('first_name', {required: t('global.label.required'),})}
                                                         className="border border-gray-300 rounded p-2 w-full"
                                                     />
                                                     {errors.first_name && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.first_name.message}</p>}
@@ -487,12 +495,12 @@ export default function PhotoOrder() {
 
 
                                                 <div className="relative">
-                                                    <label htmlFor="last_name" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">Last name</label>
+                                                    <label htmlFor="last_name" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.lastname')}</label>
 
                                                     <input
                                                         type="text"
                                                         id="last_name"
-                                                        {...register('last_name', {required: 'Last Name is required'})}
+                                                        {...register('last_name', {required: t('global.label.required'),})}
                                                         className="border border-gray-300 rounded p-2 w-full"
                                                     />
                                                     {errors.last_name && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.last_name.message}</p>}
@@ -505,7 +513,7 @@ export default function PhotoOrder() {
                                                     type="email"
                                                     id="email"
                                                     {...register('email', {
-                                                        required: 'Email is required',
+                                                        required: t('global.label.required'),
                                                         pattern: {
                                                             value: /\S+@\S+\.\S+/,
                                                             message: 'Invalid email format',
@@ -517,11 +525,11 @@ export default function PhotoOrder() {
                                             </div>
 
                                             <div className="relative mb-7">
-                                                <label htmlFor="address" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">Address</label>
+                                                <label htmlFor="address" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.address')}</label>
                                                 <input
                                                     type="text"
                                                     id="address"
-                                                    {...register('address', {required: 'Address is required'})}
+                                                    {...register('address', {required: t('global.label.required'),})}
                                                     className="border border-gray-300 rounded p-2 w-full"
                                                 />
                                                 {errors.address && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.address.message}</p>}
@@ -529,23 +537,23 @@ export default function PhotoOrder() {
 
                                             <div className="grid grid-cols-2 gap-3 mb-7">
                                                 <div className="relative">
-                                                    <label htmlFor="country" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">Country</label>
+                                                    <label htmlFor="country" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.country')}</label>
                                                     <input
                                                         type="text"
                                                         id="country"
-                                                        {...register('country', {required: 'Country is required'})}
+                                                        {...register('country', {required: t('global.label.required'),})}
                                                         className="border border-gray-300 rounded p-2 w-full"
                                                     />
                                                     {errors.country && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.country.message}</p>}
                                                 </div>
 
                                                 <div className="relative">
-                                                    <label htmlFor="city" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">City</label>
+                                                    <label htmlFor="city" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.city')}</label>
 
                                                     <input
                                                         type="text"
                                                         id="city"
-                                                        {...register('city', {required: 'City is required'})}
+                                                        {...register('city', {required: t('global.label.required'),})}
                                                         className="border border-gray-300 rounded p-2 w-full"
                                                     />
                                                     {errors.city && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.city.message}</p>}
@@ -555,29 +563,30 @@ export default function PhotoOrder() {
                                             <div className="grid grid-cols-2 gap-3 mb-7">
 
                                                 <div className="relative">
-                                                    <label htmlFor="zip_code" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">Postal code</label>
+                                                    <label htmlFor="zip_code" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.zip')}</label>
 
                                                     <input
                                                         type="text"
                                                         id="zip_code"
-                                                        {...register('zip_code', {required: 'Postal Code is required'})}
+                                                        {...register('zip_code', {required: t('global.label.required')})}
                                                         className="border border-gray-300 rounded p-2 w-full"
                                                     />
                                                     {errors.zip_code && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.zip_code.message}</p>}
                                                 </div>
 
+
                                                 <div className="relative">
-                                                    <label htmlFor="phone" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">Phone</label>
+                                                    <label htmlFor="phone" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.phone')}</label>
 
                                                     <input
                                                         type="tel"
                                                         id="phone"
-                                                        placeholder="Phone (e.g., 07xx-xxx-xxx)"
+                                                        placeholder="Telefon (e.g., 07xxxxxxxx)"
                                                         {...register('phone', {
-                                                            required: 'Phone is required',
+                                                            required: t('global.label.required'),
                                                             pattern: {
                                                                 value: /^(0[2347][0-9]{2}[-. ]?[0-9]{3}[-. ]?[0-9]{3}|0[56][0-9]{8})$/,
-                                                                message: 'Invalid format (e.g., XXXX XXX XXX)',
+                                                                message: 'Invalid format',
                                                             },
                                                         })}
                                                         className="border border-gray-300 rounded p-2 w-full"
@@ -586,35 +595,43 @@ export default function PhotoOrder() {
                                                 </div>
                                             </div>
 
+                                            <div className="relative">
+                                                <label htmlFor="zip_code" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.details')}</label>
+
+                                                <input
+                                                    type="text"
+                                                    id="details"
+                                                    {...register('details')}
+                                                    className="border border-gray-300 rounded p-2 w-full"
+                                                />
+                                                {errors.details && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.details.message}</p>}
+                                            </div>
+
                                             <div className="relative my-5 px-4 py-2 bg-background rounded-sm">
-                                                <label className="font-bold">Shipping Option</label>
+                                                <label className="font-bold">{t('global.order.shipping')}</label>
                                                 <div className="relative flex flex-col text-secondary">
                                                     <label>
                                                         <input
                                                             type="radio"
                                                             checked={true}
                                                             className="mr-2"
-                                                            // @ts-ignore
-                                                            name="shippingOption"
                                                             value="personal"
-                                                            {...register('shippingOption', {required: 'Shipping Option is required'})}
+                                                            {...register('shipping', {required: t('global.order.shipping')})}
                                                         />
-                                                        Személyes átvétel (Gyergyószentmiklós, Békény utca 72)
+                                                        {t('global.personal.upload')}
 
                                                     </label>
                                                     <label>
                                                         <input
                                                             type="radio"
                                                             className="mr-2"
-                                                            // @ts-ignore
-                                                            name="shippingOption"
                                                             value="courier"
-                                                            {...register('shippingOption', {required: 'Shipping Option is required'})}
+                                                            {...register('shipping', {required: t('global.order.shipping')})}
                                                         />
-                                                        Szállítás futárszolgáltató által (+20RON)
+                                                        {t('global.curier.upload')}
                                                     </label>
                                                 </div>
-                                                {errors.shippingOption && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.shippingOption.message}</p>}
+                                                {errors.shipping && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.shipping.message}</p>}
                                             </div>
 
                                             <div className="relative">
@@ -623,9 +640,9 @@ export default function PhotoOrder() {
                                                         <input
                                                             className="mr-2"
                                                             type="checkbox"
-                                                            {...register('terms', {required: 'Please accept terms and conditions'})}
+                                                            {...register('terms', {required: t('global.label.required')})}
                                                         />
-                                                        <span className="font-light">Sunt de acord cu termenii si conditiile ale paginii de <a className="font-semibold text-primary underline" href="https://ajandekok.ro/termeni-si-conditii">aici</a>. </span>
+                                                        <span className="font-light">{t('global.terms.text')} <a className="font-semibold text-primary underline" href="https://ajandekok.ro/termeni-si-conditii">{t('global.here')}</a>. </span>
                                                     </label>
 
                                                 </div>
@@ -645,8 +662,8 @@ export default function PhotoOrder() {
                                 <div className="py-5 px-5 rounded-md bg-white shadow-md text-secondary">
                                     <div className="flex items-center justify-between pb-5 border-b">
                                         <div>
-                                            <h3 className="font-bold flex items-center justify-between">Order summary</h3>
-                                            <span className="text-sm"> ({imageFields.length}) items</span>
+                                            <h3 className="font-bold flex items-center justify-between">{t('global.billing.details')}</h3>
+                                            <span className="text-sm"> ({imageFields.length}) {t('global.billing.quantity')}</span>
                                         </div>
                                         <PencilSquareIcon role="presentation" onClick={() => setCurrentStep({step:2})} className="w-7 h-7 text-primary"/>
                                     </div>
@@ -668,10 +685,10 @@ export default function PhotoOrder() {
                                                 <div className="pl-5 text-sm">
                                                     {returnDimensionNameById(field.dimensions)}
                                                     <div className="text-secondary text-sm">
-                                                        Cantitate: {field.quantity}
+                                                        {t('descriptive.text.quantity')}: {field.quantity}
                                                     </div>
                                                     <div className="text-secondary text-sm">
-                                                        Pret: <strong>{calculateFieldPrice(field.dimensions, field.quantity)} RON</strong>
+                                                        {t('descriptive.text.price')}: <strong>{calculateFieldPrice(field.dimensions, field.quantity)} RON</strong>
                                                     </div>
                                                 </div>
                                             </div>
@@ -679,17 +696,15 @@ export default function PhotoOrder() {
                                     </div>
 
                                     <div className="grid grid-cols-2 py-2 border-t border-b">
-                                        <div className="text-left font-bold">Total</div>
+                                        <div className="text-left font-bold">{t('global.billing.total')}</div>
                                         <div className="text-right font-bold">{totalPrice.toFixed(2)} RON</div>
                                     </div>
 
 
                                     <div className="text-center my-5">
-                                        <button className="font-semibold text-white bg-primary inline-block py-2 rounded-full px-5 text-sm" onClick={handleClick}>Trimite comanda</button>
+                                        <button className="font-semibold text-white bg-primary inline-block py-2 rounded-full px-5 text-sm" onClick={handleClick}> {t('button.order')}</button>
                                     </div>
-
-
-                                    <p className="text-xs pt-10">Daca ai intrebari sau alte opinii te rog sa ne scrii un email la <strong>office@ajandekok.ro</strong> si iti vom raspunde cu cel mai mare drag. Te mai asteptam.</p>
+                                    <p className="text-xs pt-10">{t('global.write.us')}</p>
                                 </div>
                             </div>
                         </div>
@@ -702,19 +717,19 @@ export default function PhotoOrder() {
                 className={`${ currentStep.step === 2 ? 'block md:flex opacity-100' : 'hidden opacity-0' }  text-center bg-background border-t shadow-md py-5 justify-between md:text-right px-10`}>
                 <div className="text-secondary text-left mb-3 md:mb-0 flex items-center">
                     <div>
-                        Total Price: <strong>RON: {totalPrice.toFixed(2)}</strong>
+                        {t('global.billing.total')}: <strong>RON: {totalPrice.toFixed(2)}</strong>
                     </div>
                 </div>
 
                 {currentStep.step === 1 &&
                     <div onClick={addImageField} role="presentation"
-                         className="font-semibold bg-primary inline-block py-4 rounded-full px-5 text-sm">Configureaza
+                         className="font-semibold bg-primary inline-block py-4 rounded-full px-5 text-sm">
+                        {t('global.config')}
                     </div>}
 
                 {currentStep.step === 2 &&
                     <div onClick={() => saveImages()}
-                         className="font-semibold bg-primary inline-block py-2 rounded-full px-5 text-sm">Finalizeaza
-                        comanda
+                         className="font-semibold bg-primary inline-block py-2 rounded-full px-5 text-sm">  {t('global.finish')}
                     </div>}
 
             </div>

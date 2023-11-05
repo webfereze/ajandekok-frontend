@@ -3,8 +3,11 @@ import LogoImage from "@/assets/img/logo.png";
 import React from "react";
 import {ShoppingCartIcon, HomeIcon, Bars3BottomRightIcon} from '@heroicons/react/24/outline'
 import Link from "next/link";
+import LanguageSwitcher from "@/pages/components/LanguageSwitcher";
+import {useTranslation} from "next-i18next";
 
 export default function HeaderUser() {
+    const {t} = useTranslation();
 
   return (
 
@@ -21,12 +24,13 @@ export default function HeaderUser() {
                       <div className="hidden md:flex">
                           <Link className="flex items-center px-2" href="/">
                               <ShoppingCartIcon className="w-6 h-6 text-primary mr-1"/>
-                              <span className="text-secondary mr-2 text-sm font-semibold">Order</span>
+                              <span className="text-secondary mr-2 text-sm font-semibold">{t('global.header.order')}</span>
                           </Link>
                           <Link className="flex items-center px-2" href="https://ajandekok.ro/#contact">
                               <HomeIcon className="w-6 h-6 text-primary mr-1"/>
-                              <span className="text-secondary mr-2 text-sm font-semibold">Contact</span>
+                              <span className="text-secondary mr-2 text-sm font-semibold">{t('global.header.contact')}</span>
                           </Link>
+                          <LanguageSwitcher />
                       </div>
                   </div>
               </div>

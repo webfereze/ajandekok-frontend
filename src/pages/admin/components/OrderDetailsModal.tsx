@@ -35,6 +35,9 @@ function OrderDetailsModal({ order, onClose } : {order:any, onClose:any}) {
                                         <strong> Order ID: </strong> {order.id}
                                     </p>
                                     <p className="text-sm text-gray-500">
+                                        <strong> Shipping: </strong> {order.shipping}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
                                         <strong> First Name:</strong> {order.first_name}
                                     </p>
                                     <p className="text-sm text-gray-500">
@@ -58,10 +61,14 @@ function OrderDetailsModal({ order, onClose } : {order:any, onClose:any}) {
                                     <p className="text-sm text-gray-500">
                                         <strong>City: </strong>{order.city}
                                     </p>
-
+                                    <p className="text-sm text-gray-500">
+                                        <strong> Mentions: </strong> {order.details}
+                                    </p>
                                     <p className="text-sm text-gray-500 pb-2 border-b">
                                         <strong>Country: </strong>{order.country}
                                     </p>
+
+
 
                                     {order.order_photos && order.order_photos.map((photo:any) => (
                                         <div key={photo.url} className="border-b text-sm py-4 text-gray-500 relative flex items-start justify-between">
