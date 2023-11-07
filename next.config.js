@@ -12,7 +12,10 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
-  }
+  },
+  generateBuildId: async () => {
+    return 'ajandekok-build-id'
+  },
 }
 
 module.exports = {...nextConfig, i18n}

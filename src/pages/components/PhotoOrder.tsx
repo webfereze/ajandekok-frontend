@@ -252,17 +252,17 @@ export default function PhotoOrder() {
                     <div className="text-center flex flex-col">
                         <span
                             className={`text-white bg-primary  w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>1</span>
-                        <p className="text-sm text-secondary font-semibold mt-1">{t('global.step.1')}</p>
+                        <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.1')}</p>
                     </div>
                     <div className="text-center flex flex-col" onClick={addImageField}>
                         <span
                             className={`${currentStep.step > 1 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>2</span>
-                        <p className="text-sm text-secondary font-semibold mt-1">{t('global.step.2')}</p>
+                        <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.2')}</p>
                     </div>
                     <div className="text-center flex flex-col">
                         <span
                             className={`${currentStep.step > 2 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>3</span>
-                        <p className="text-sm text-secondary font-semibold mt-1">{t('global.step.3')}</p>
+                        <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.3')}</p>
                     </div>
 
 
@@ -272,11 +272,11 @@ export default function PhotoOrder() {
 
             {currentStep.step === 1 &&
             <div className="container mx-auto">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="block md:grid grid-cols-2 gap-3">
                     <div>
                         <Image alt="Ajandekok.ro | Order page" className="rounded-md" src={HeroImage2}/>
                     </div>
-                    <div className="p-10 text-secondary">
+                    <div className="p-2 md:p-10 text-secondary">
                         <h1 className="text-left text-4xl font-bold ">
                             {t('hero.title')}</h1>
                         <span className="text-xs block">Part of <a href="https://www.ajandekok.ro" className="text-primary font-semibold">ajandekok.ro</a> KolPicShop.</span>
@@ -290,7 +290,7 @@ export default function PhotoOrder() {
                         </p>
                         <div
                             onClick={addImageField} role="presentation"
-                            className="bg-primary inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
+                            className="bg-primary w-full md:w-fit inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
                             {t('button.try')}
                         </div>
                         </div>
@@ -305,7 +305,7 @@ export default function PhotoOrder() {
                     <div className="bg-background block md:grid grid-cols-3 p-10 w-full rounded-xl">
                         <div className="bg-background col-span-2 rounded-xl py-5 px-5 cursor-pointer text-center">
                             <Image className="mx-auto" src={GalleryIcon} alt="Ajandekok.ro | Gallery"/>
-                            <p className="text-secondary text-sm pt-5 text-center">
+                            <p className="text-secondary text-xs pt-5 text-center">
                                 {t('descriptive.text.click.to.configure')}
                             </p>
                             <p className="text-lightGrey text-xs py-2">JPG/TIF, min 700x700 px, max 3000x3000 px,
@@ -473,10 +473,10 @@ export default function PhotoOrder() {
             {currentStep.step === 3 && imageFields.length > 0 && <div className="text-secondary">
                 <div className="bg-background">
                     <div className="container mx-auto px-2">
-                        <div className="grid grid-cols-3 gap-5 py-5">
+                        <div className="block md:grid grid-cols-3 gap-5 py-5">
 
-                            <div className="col-span-2">
-                                <div className="py-10 px-5 rounded-md bg-white shadow-md text-secondary">
+                            <div className="col-span-2 mt-2 md:mt-0">
+                                <div className="py-5 md:py-10 px-5 rounded-md bg-white shadow-md text-secondary">
 
                                     <h3 className="font-bold text-sm mb-5 text-secondary"> {t('global.billing.details')}</h3>
                                     <form onSubmit={handleSubmit(onSubmit)} >
@@ -656,7 +656,7 @@ export default function PhotoOrder() {
 
                             </div>
 
-                            <div className="col-span-1">
+                            <div className="col-span-1 mt-2 md:mt-0">
 
 
                                 <div className="py-5 px-5 rounded-md bg-white shadow-md text-secondary">

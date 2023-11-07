@@ -1,14 +1,39 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {FolderArrowDownIcon, XMarkIcon} from '@heroicons/react/24/solid'
+import axios from "axios";
+import {useSelector} from "react-redux";
+import {router} from "next/client";
 
-function OrderDetailsModal({ order, onClose } : {order:any, onClose:any}) {
-
+function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any, onFetch:any}) {
+    const user = useSelector((state: any) => state.user);
+    const {token} = user;
+    const apiUrl = 'https://www.ajandekok.fereze.com/api/orders';
     const downloadImage = (imageUrl:string) => {
         const anchor = document.createElement('a');
         anchor.href = imageUrl;
         window.open(imageUrl, '_blank');
         anchor.click();
         document.body.removeChild(anchor);
+    };
+
+    const [selectedStatus, setSelectedStatus] = useState<string>(order.status);
+
+    const handleStatusChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const newStatus = event.target.value;
+        setSelectedStatus(newStatus);
+        console.log(`Selected status: ${newStatus}`);
+
+        try {
+             const response = await axios.put(`https://www.ajandekok.fereze.com/api/orders/${order.id}`, {status:parseInt(newStatus)}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            onFetch();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
     };
 
     return (
@@ -23,7 +48,29 @@ function OrderDetailsModal({ order, onClose } : {order:any, onClose:any}) {
                         <div className="sm:flex sm:items-start">
                             <div className="mt-3 w-full  text-left">
                                 <div className="flex items-center justify-between border-b pb-3">
-                                    <h3 className="text-lg leading-6 font-medium text-gray-900">Order Details</h3>
+                                    <div>
+                                        <h3 className="text-lg leading-6 font-medium text-gray-900">Order Details</h3>
+                                        <div className="flex items-center">
+                                            <label htmlFor="statusSelect" className="mr-2 text-secondary">
+                                                Select Status:
+                                            </label>
+                                            <select
+                                                id="statusSelect"
+                                                name="status"
+                                                value={selectedStatus}
+                                                onChange={handleStatusChange}
+                                                className="px-2 py-1 border rounded-md text-secondary"
+                                            >
+                                                <option value="1">Awaiting</option>
+                                                <option value="2">In Progress</option>
+                                                <option value="3">Delivered</option>
+                                                <option value="4">Cancelled</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+
                                     <div
                                         className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer">
                                         <XMarkIcon onClick={onClose} className="w-5 h-5 text-secondary" />

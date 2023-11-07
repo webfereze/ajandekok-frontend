@@ -12,8 +12,8 @@ export default function Footer() {
           <div className="container mx-auto">
               <div className="block md:grid grid-cols-3">
                   <div className="mb-5">
-                      <Image width={180} src={LogoWhite} alt="Ajandekok.ro | Logo"/>
-                      <div className="flex items-center justify-start mt-5">
+                      <Image className="mx-auto md:mx-0" width={180} src={LogoWhite} alt="Ajandekok.ro | Logo"/>
+                      <div className="flex items-center justify-center md:justify-start mt-5">
                           <a href="https://www.facebook.com/kolpicshop">
                               <div className="bg-secondary hover:bg-white rounded-full transition-all duration-300 mr-2">
                                   <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@ export default function Footer() {
                       <span className="text-primary text-sm text-center">@copyright 2023. All rights reserved</span>
                   </div>
 
-                  <div className="text-right flex flex-col items-end">
+                  <div className="text-center md:text-right flex flex-col items-center md:items-end mt-2 md:mt-0">
                       <a href="https://anpc.ro/ce-este-sal/" className="mb-5 block">
                           <Image width={180} src={Anpc} alt="Ajandekok.ro | ANPC"/>
                       </a>

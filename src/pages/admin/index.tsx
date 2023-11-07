@@ -7,6 +7,7 @@ import {PencilSquareIcon} from '@heroicons/react/24/solid'
 import {TrashIcon} from '@heroicons/react/24/outline'
 import ConfirmModal from "@/pages/admin/components/ConfirmModal";
 import toast, {Toaster} from "react-hot-toast";
+import {router} from "next/client";
 
 
 export default function Dashboard() {
@@ -81,7 +82,7 @@ export default function Dashboard() {
         <div className="min-h-screen bg-surface">
             <HeaderAdmin/>
             {isModalOpen && (
-                <OrderDetailsModal order={selectedOrder} onClose={closeModal} />
+                <OrderDetailsModal order={selectedOrder} onFetch={fetchData} onClose={closeModal} />
             )}
 
             <ConfirmModal isOpen={isConfirmModalOpen} onClose={handleConfirmCloseModal} onConfirm={handleConfirm} />
