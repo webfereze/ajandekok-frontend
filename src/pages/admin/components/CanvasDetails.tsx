@@ -98,10 +98,10 @@ export default function CanvasDetails() {
                         <li key={product.id} className="p-5 border rounded mb-5 shadow-sm">
                             <div className="flex items-center">
                                 <div className="flex items-center rounded-md text-white bg-gray-500 w-fit mr-5 border">
-                                    <div className="w-[100px] px-2">
+                                    <div className="w-[120px] px-2">
                                         {product.dimension}
                                     </div>
-                                    <div className="w-[100px] text-center bg-gray-200 ml-5 p-2 text-secondary">
+                                    <div className="w-[120px] text-center bg-gray-200 ml-5 p-2 text-secondary">
                                         {product.price} RON
                                     </div>
                                 </div>

@@ -8,6 +8,7 @@ import {TrashIcon} from '@heroicons/react/24/outline'
 import ConfirmModal from "@/pages/admin/components/ConfirmModal";
 import toast, {Toaster} from "react-hot-toast";
 import {router} from "next/client";
+import {useRouter} from "next/router";
 
 
 export default function Dashboard() {
@@ -19,6 +20,12 @@ export default function Dashboard() {
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!token) {router.push('/admin/login')}
+    }, [token, router]);
 
     const openModal = (order:any) => {
         setSelectedOrder(order)
@@ -68,7 +75,6 @@ export default function Dashboard() {
     };
 
     const handleConfirmCloseModal = () => {
-        console.log("close");
         setConfirmModalOpen(false);
         setSelectedOrderId(null);
     };

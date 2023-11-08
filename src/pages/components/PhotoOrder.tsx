@@ -9,6 +9,7 @@ import {useSelector} from "react-redux";
 import HeroImage2 from "@/assets/img/order-img-2.jpg";
 import {Router, useRouter} from "next/router";
 import {useTranslation} from "next-i18next";
+import useWindowDimensions from "@/pages/components/useMediaQuery";
 
 interface ImageField {
     file: File | null;
@@ -46,8 +47,8 @@ export default function PhotoOrder() {
     const apiUrl = 'https://www.ajandekok.fereze.com/api/canvas';
     const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number }[]>([]);
     const [currentStep, setCurrentStep] = useState<CurrentStep>({step: 1});
-    const router = useRouter()
     const { t } = useTranslation();
+    const { isMobile } = useWindowDimensions();
 
     const user = useSelector((state: any) => state.user);
     const {token} = user;
@@ -58,6 +59,8 @@ export default function PhotoOrder() {
     } = useForm<FormData>();
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
+
+
         const formData = new FormData();
         formData.append('first_name', data.first_name);
         formData.append('last_name', data.last_name);
@@ -90,7 +93,7 @@ export default function PhotoOrder() {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            await router.push('/thankyou');
+            // await router.push('/thankyou');
         } catch (error) {
             toast.error("Error processing your request.");
         }
@@ -126,15 +129,19 @@ export default function PhotoOrder() {
         setImageFields([...imageFields, newImageField]);
     };
 
-    // Function to handle file input changes
-    const handleFileChange = (index: number, file: File | null) => {
+    const handleFileChange = async (index: number, file: File | null) => {
         const updatedFields = [...imageFields];
         updatedFields[index].file = file;
         updatedFields[index].error = '';
+
         if (file) {
             const reader = new FileReader();
             reader.onload = (e:any) => {
-                updatedFields[index].previewURL = e.target ? e.target.result as string : '';
+                let imagePreviewUrl = e.target ? e.target.result as string : '';
+                if (!isMobile && ( file.type === 'image/heic' || file.type === 'image/heif')) {
+                    imagePreviewUrl = 'https://pozacanvas.ro/placeholder.png'
+                }
+                updatedFields[index].previewURL = imagePreviewUrl;
                 setImageFields(updatedFields);
             };
             reader.readAsDataURL(file);
@@ -251,7 +258,7 @@ export default function PhotoOrder() {
                     className={`${currentStep.step === 2 ? 'steps-border-half' : ''} ${currentStep.step === 3 ? '!steps-border-full ' : ''}relative my-5 flex mx-auto sm:w-1/2 md:1/3 lg:1/4 justify-between steps-border`}>
                     <div className="text-center flex flex-col">
                         <span
-                            className={`text-white bg-primary  w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>1</span>
+                            className={`text-white bg-primary  w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer ml-0 z-[2]`}>1</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.1')}</p>
                     </div>
                     <div className="text-center flex flex-col" onClick={addImageField}>
@@ -261,7 +268,7 @@ export default function PhotoOrder() {
                     </div>
                     <div className="text-center flex flex-col">
                         <span
-                            className={`${currentStep.step > 2 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>3</span>
+                            className={`${currentStep.step > 2 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex ml-auto mr-0 items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>3</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.3')}</p>
                     </div>
 
@@ -449,14 +456,6 @@ export default function PhotoOrder() {
                             <p className="text-secondary text-sm text-center">{t('descriptive.text.another.one.title')}</p>
                             <p className="text-lightGrey text-xs py-2">{t('descriptive.text.another.one.desc')}</p>
 
-                            {/*<p className="text-lightGrey text-xs py-2">Also <strong>discounts</strong> are apllied. </p>*/}
-                            {/*<div className="text-xs">*/}
-                            {/*    <div>+50db - 10%</div>*/}
-                            {/*    <div>+100db - 20%</div>*/}
-                            {/*    <div>+200db - 30%</div>*/}
-                            {/*    <div>+400db - 40%</div>*/}
-                            {/*    <div>+500db - 50%</div>*/}
-                            {/*</div>*/}
                             <div>
                                 <div
                                     className="bg-primary inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
@@ -464,12 +463,10 @@ export default function PhotoOrder() {
                                 </div>
                             </div>
 
-
                         </div>
                     </div>
                 </div>
             }
-
             {currentStep.step === 3 && imageFields.length > 0 && <div className="text-secondary">
                 <div className="bg-background">
                     <div className="container mx-auto px-2">
@@ -481,7 +478,7 @@ export default function PhotoOrder() {
                                     <h3 className="font-bold text-sm mb-5 text-secondary"> {t('global.billing.details')}</h3>
                                     <form onSubmit={handleSubmit(onSubmit)} >
                                         <div>
-                                            <div className="grid grid-cols-2 gap-3 mb-7">
+                                            <div className="grid grid-cols-2 gap-3 mb-10">
                                                 <div className="relative">
                                                     <label htmlFor="first_name" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.firstname')}</label>
                                                     <input
@@ -507,7 +504,7 @@ export default function PhotoOrder() {
                                                 </div>
                                             </div>
 
-                                            <div className="relative my-7">
+                                            <div className="relative my-10">
                                                 <label htmlFor="email" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">E-mail</label>
                                                 <input
                                                     type="email"
@@ -524,7 +521,7 @@ export default function PhotoOrder() {
                                                 {errors.email && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.email.message}</p>}
                                             </div>
 
-                                            <div className="relative mb-7">
+                                            <div className="relative mb-10">
                                                 <label htmlFor="address" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.address')}</label>
                                                 <input
                                                     type="text"
@@ -535,7 +532,7 @@ export default function PhotoOrder() {
                                                 {errors.address && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.address.message}</p>}
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3 mb-7">
+                                            <div className="grid grid-cols-2 gap-3 mb-10">
                                                 <div className="relative">
                                                     <label htmlFor="country" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.country')}</label>
                                                     <input
@@ -560,7 +557,7 @@ export default function PhotoOrder() {
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3 mb-7">
+                                            <div className="grid grid-cols-2 gap-3 mb-10">
 
                                                 <div className="relative">
                                                     <label htmlFor="zip_code" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.zip')}</label>

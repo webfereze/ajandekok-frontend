@@ -21,8 +21,6 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
     const handleStatusChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newStatus = event.target.value;
         setSelectedStatus(newStatus);
-        console.log(`Selected status: ${newStatus}`);
-
         try {
              const response = await axios.put(`https://www.ajandekok.fereze.com/api/orders/${order.id}`, {status:parseInt(newStatus)}, {
                 headers: {

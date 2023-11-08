@@ -54,11 +54,11 @@ body {
 
   .steps-border-half::after {
     content: "";
-    width: calc(50% - 50px);
+    width: calc(50%);
     height: 2px;
     top: 15px;
-    left: 50px;
-    right: 25px;
+    left: 0px;
+    right: 0px;
     position: absolute;
     z-index: 1;
     background: #CE311A;

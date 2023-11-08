@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useForm } from 'react-hook-form';
 import axios from "axios";
 import {useRouter} from "next/router";
 import LogoImage from "../../../assets/img/logo.png"
 import Image from "next/image";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setUser} from "@/userManagement/userSlice";
 import {AdminFormData} from "@/pages/components/PhotoOrder";
 import toast, {Toaster} from "react-hot-toast";
@@ -14,12 +14,15 @@ import toast, {Toaster} from "react-hot-toast";
 // const { t } = useTranslation('common');
 
 export default function Login() {
+    const user = useSelector((state: any) => state.user);
+    const {token} = user;
+    const router = useRouter();
     const dispatch = useDispatch();
-
     const { register, handleSubmit, formState: { errors } } = useForm<AdminFormData>();
 
-    const router = useRouter();
-
+    useEffect(() => {
+        if (token) {router.push('/admin')}
+    }, [token, router]);
     const onSubmit = async (data:any) => {
         try {
             const response = await axios.post('https://www.ajandekok.fereze.com/api/login', data);

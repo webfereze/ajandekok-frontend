@@ -57,11 +57,7 @@ const ImageRepeater: React.FC = () => {
     const handleSubmit = () => {
         const isAnyFileEmpty = imageFields.some((field) => !field.file);
         if (isAnyFileEmpty) {
-            // Display an error message or handle the validation as needed
             console.log('File is required for all fields.');
-        } else {
-            // Save the data from imageFields to your backend or perform any necessary actions
-            console.log('Submitted data:', imageFields);
         }
     };
 
