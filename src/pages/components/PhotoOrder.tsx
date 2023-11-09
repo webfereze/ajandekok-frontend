@@ -287,12 +287,13 @@ export default function PhotoOrder() {
                     <div className="p-2 md:p-10 text-secondary">
                         <h1 className="text-left text-4xl font-bold ">
                             {t('hero.title')}</h1>
+
                         <span className="text-xs block">Part of <a href="https://www.ajandekok.ro" className="text-primary font-semibold">ajandekok.ro</a> KolPicShop.</span>
 
-                        <p className="py-5 text-md">
-                            {t('hero.copyright')}
-                            {t('hero.description')}
-                        </p>
+                        <div className="py-5 text-md">
+
+                            <p>{t('hero.description')}</p>
+                        </div>
                         <p className="text-md">
                             {t('hero.description.2')}
                         </p>
@@ -309,7 +310,7 @@ export default function PhotoOrder() {
 
             {currentStep.step === 1 &&
                 <div className="container px-2 mx-auto my-10">
-                    <h1 className="text-center text-secondary text-4xl font-bold mb-10">{t('global.photo.order.text')}</h1>
+                    <h1 className="text-center text-secondary text-4xl font-bold mb-10" onClick={addImageField}>{t('descriptive.text.click.here')}</h1>
                     <div className="bg-background block md:grid grid-cols-3 p-10 w-full rounded-xl">
                         <div className="bg-background col-span-2 rounded-xl py-5 px-5 cursor-pointer text-center">
                             <Image className="mx-auto" src={GalleryIcon} alt="Ajandekok.ro | Gallery"/>
@@ -345,7 +346,7 @@ export default function PhotoOrder() {
 
             {currentStep.step == 2 && imageFields.length > 0 &&
                 <div className="container mx-auto">
-                    <h1 className="text-3xl text-secondary text-center my-5 font-bold ">{t('descriptive.text.click.to.configure')}</h1>
+                    <h1 className="text-3xl text-secondary text-center my-5 font-bold ">{t('global.photo.order.text')}</h1>
                     <div className="block md:grid grid-cols-3 lg:grid-cols-4 gap-4 mt-10 mb-20">
                         {imageFields.map((field:any, index) => (
                             <div key={index}

@@ -15,7 +15,7 @@ export default function CanvasDetails() {
     const [products, setProducts] = useState([]);
     const user = useSelector((state: any) => state.user);
     const {token} = user;
-    const apiUrl = `${process.env.API_URL}/api/orders`;
+    const apiUrl = `${process.env.API_URL}/api/canvas`;
     const [newProduct, setNewProduct] = useState({dimension: '', price: 0});
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
