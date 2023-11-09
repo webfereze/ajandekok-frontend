@@ -6,10 +6,11 @@ import toast, {Toaster} from "react-hot-toast";
 import {TrashIcon, PencilSquareIcon, PlusIcon} from '@heroicons/react/24/outline'
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
-import HeroImage2 from "@/assets/img/order-img-2.jpg";
+import HeroImage2 from "@/assets/img/hero.png";
 import {Router, useRouter} from "next/router";
 import {useTranslation} from "next-i18next";
 import useWindowDimensions from "@/pages/components/useMediaQuery";
+import * as process from "process";
 
 interface ImageField {
     file: File | null;
@@ -44,11 +45,12 @@ export interface AdminFormData {
 }
 
 export default function PhotoOrder() {
-    const apiUrl = 'https://www.ajandekok.fereze.com/api/canvas';
+    const apiUrl = `${process.env.API_URL}/api/orders`;
     const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number }[]>([]);
     const [currentStep, setCurrentStep] = useState<CurrentStep>({step: 1});
     const { t } = useTranslation();
     const { isMobile } = useWindowDimensions();
+    const router = useRouter();
 
     const user = useSelector((state: any) => state.user);
     const {token} = user;
@@ -87,13 +89,13 @@ export default function PhotoOrder() {
         });
 
         try {
-            const response = await axios.post('https://www.ajandekok.fereze.com/api/orders', formData, {
+            const response = await axios.post(apiUrl, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            // await router.push('/thankyou');
+            await router.push('/thankyou');
         } catch (error) {
             toast.error("Error processing your request.");
         }
@@ -101,7 +103,7 @@ export default function PhotoOrder() {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(apiUrl);
+            const response = await axios.get(`${process.env.API_URL}/api/canvas`);
             setAvailableDimensions(response.data)
         } catch (error) {
             console.error('Error:', error);
@@ -138,8 +140,8 @@ export default function PhotoOrder() {
             const reader = new FileReader();
             reader.onload = (e:any) => {
                 let imagePreviewUrl = e.target ? e.target.result as string : '';
-                if (!isMobile && ( file.type === 'image/heic' || file.type === 'image/heif')) {
-                    imagePreviewUrl = 'https://pozacanvas.ro/placeholder.png'
+                if (!isMobile && (file.type == 'image/heic' || file.type === 'image/heif')) {
+                    imagePreviewUrl = 'https://pozacanvas.ro/placeholder.png';
                 }
                 updatedFields[index].previewURL = imagePreviewUrl;
                 setImageFields(updatedFields);
@@ -254,9 +256,8 @@ export default function PhotoOrder() {
             <Toaster position="top-right"/>
             <div className="container px-2 mx-auto my-10">
                 <div
-                    onClick={()=>setCurrentStep({step:1})}
                     className={`${currentStep.step === 2 ? 'steps-border-half' : ''} ${currentStep.step === 3 ? '!steps-border-full ' : ''}relative my-5 flex mx-auto sm:w-1/2 md:1/3 lg:1/4 justify-between steps-border`}>
-                    <div className="text-center flex flex-col">
+                    <div className="text-center flex flex-col" onClick={()=>setCurrentStep({step:1})}>
                         <span
                             className={`text-white bg-primary  w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer ml-0 z-[2]`}>1</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.1')}</p>
@@ -266,7 +267,7 @@ export default function PhotoOrder() {
                             className={`${currentStep.step > 1 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>2</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.2')}</p>
                     </div>
-                    <div className="text-center flex flex-col">
+                    <div onClick={()=> toast.error("Complete the details please.")} className="text-center flex flex-col">
                         <span
                             className={`${currentStep.step > 2 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex ml-auto mr-0 items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>3</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.3')}</p>
@@ -366,6 +367,7 @@ export default function PhotoOrder() {
                                     </div>
                                     <input
                                         type="file"
+                                        accept="image/*, image/heic, image/heif"
                                         ref={(el) => (fileInputRefs.current[index] = el)}
                                         onChange={(e) => handleFileChange(index, e.target.files ? e.target.files[0] : null)}
                                         className="hidden"
@@ -667,7 +669,7 @@ export default function PhotoOrder() {
 
                                     <div>
                                         {imageFields.map((field:any, index) => (
-                                            <div className="flex items-center justify-start mb-4" key={index}>
+                                            <div className="flex items-center justify-start mb-4 mt-2" key={index}>
                                                 {field.previewURL && (
                                                     <div className="relative">
                                                         <Image
@@ -726,7 +728,7 @@ export default function PhotoOrder() {
 
                 {currentStep.step === 2 &&
                     <div onClick={() => saveImages()}
-                         className="font-semibold bg-primary inline-block py-2 rounded-full px-5 text-sm">  {t('global.finish')}
+                         className="font-semibold bg-primary inline-block py-2 rounded-full px-5 text-sm cursor-pointer">  {t('global.finish')}
                     </div>}
 
             </div>

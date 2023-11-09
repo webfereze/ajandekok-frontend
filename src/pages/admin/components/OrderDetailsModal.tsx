@@ -2,18 +2,16 @@ import React, {useState} from 'react';
 import {FolderArrowDownIcon, XMarkIcon} from '@heroicons/react/24/solid'
 import axios from "axios";
 import {useSelector} from "react-redux";
-import {router} from "next/client";
 
 function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any, onFetch:any}) {
     const user = useSelector((state: any) => state.user);
     const {token} = user;
-    const apiUrl = 'https://www.ajandekok.fereze.com/api/orders';
+    const apiUrl = `${process.env.API_URL}/api/orders`;
     const downloadImage = (imageUrl:string) => {
         const anchor = document.createElement('a');
         anchor.href = imageUrl;
         window.open(imageUrl, '_blank');
         anchor.click();
-        document.body.removeChild(anchor);
     };
 
     const [selectedStatus, setSelectedStatus] = useState<string>(order.status);
@@ -22,7 +20,7 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
         const newStatus = event.target.value;
         setSelectedStatus(newStatus);
         try {
-             const response = await axios.put(`https://www.ajandekok.fereze.com/api/orders/${order.id}`, {status:parseInt(newStatus)}, {
+             const response = await axios.put(apiUrl, {status:parseInt(newStatus)}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -126,8 +124,8 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
 
                                                 </div>
                                             </div>
-                                            <img className="w-[150px]" src={photo.url}/>
-                                         </div>
+                                            <img className="w-[150px]" src={photo.url.endsWith('.heic') || photo.url.endsWith('.heif') ? 'https://www.pozacanvas.ro/placeholder.png' : photo.url} />
+                                             </div>
                                     ))}
 
 

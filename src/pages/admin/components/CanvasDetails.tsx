@@ -3,6 +3,7 @@ import axios from "axios";
 import { useSelector} from "react-redux";
 import {PencilIcon, MinusCircleIcon} from '@heroicons/react/24/solid'
 import {MinusIcon} from "@heroicons/react/20/solid";
+import process from "process";
 
 interface Product {
     id: string;
@@ -14,7 +15,7 @@ export default function CanvasDetails() {
     const [products, setProducts] = useState([]);
     const user = useSelector((state: any) => state.user);
     const {token} = user;
-    const apiUrl = 'https://www.ajandekok.fereze.com/api/canvas';
+    const apiUrl = `${process.env.API_URL}/api/orders`;
     const [newProduct, setNewProduct] = useState({dimension: '', price: 0});
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -41,7 +42,7 @@ export default function CanvasDetails() {
     };
     const handleDelete = async (id: string) => {
         try {
-            const response = await axios.delete(`https://www.ajandekok.fereze.com/api/canvas/${id}`, {
+            const response = await axios.delete(`${process.env.API_URL}/api/canvas/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -77,7 +78,7 @@ export default function CanvasDetails() {
                 }
             setEditingProduct(null);
             try {
-                const response = await axios.put(`https://www.ajandekok.fereze.com/api/canvas/${editingProduct.id}`, data, {
+                const response = await axios.put(`${process.env.API_URL}/api/canvas/${editingProduct.id}`, data, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

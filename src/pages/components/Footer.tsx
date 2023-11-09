@@ -52,7 +52,7 @@ export default function Footer() {
                       <a className="block text-background text-sm mb-2" href="https://www.ajandekok.ro/rolunk">Tudj meg többet rólunk</a>
                       <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/termeni-si-conditii/">Általános Szerződési Feltételek</a>
                       <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/politica-de-confidentialitate/">Adatkezelési tájékoztató</a>
-                      <a className="block text-background text-sm mb-2" href="Garancia">Garancia</a>
+                      <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/garancia/">Garancia</a>
                       <span className="text-primary text-sm text-center">@copyright 2023. All rights reserved</span>
                   </div>
 

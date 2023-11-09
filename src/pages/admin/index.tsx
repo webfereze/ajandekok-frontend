@@ -14,7 +14,8 @@ import {useRouter} from "next/router";
 export default function Dashboard() {
     const user = useSelector((state: any) => state.user);
     const {token} = user;
-    const apiUrl = 'https://www.ajandekok.fereze.com/api/orders';
+    const apiUrl = `${process.env.API_URL}/api/orders`;
+    console.log(apiUrl);
     const [orders, setOrders] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -58,7 +59,7 @@ export default function Dashboard() {
     const handleConfirm = async () => {
         if (selectedOrderId !== null) {
             try {
-                const response = await axios.delete(`https://www.ajandekok.fereze.com/api/orders/${selectedOrderId}`,{
+                const response = await axios.delete(`${process.env.API_URL}/api/orders/${selectedOrderId}`,{
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

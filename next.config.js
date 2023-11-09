@@ -5,6 +5,9 @@ const nextConfig = {
     locales: ['ro', 'hu'],
     defaultLocale: 'ro',
   },
+  env: {
+    API_URL: process.env.API_URL,
+  },
   reactStrictMode: true,
   trailingSlash: true,
   images: {
