@@ -78,6 +78,9 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
                                         <strong> Order ID: </strong> {order.id}
                                     </p>
                                     <p className="text-sm text-gray-500">
+                                        <strong> Coupon: </strong> {order.coupon ? order.coupon : " - "}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
                                         <strong> Shipping: </strong> {order.shipping}
                                     </p>
                                     <p className="text-sm text-gray-500">
@@ -95,6 +98,10 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
 
                                     <p className="text-sm text-gray-500 pt-2">
                                         <strong>Address: </strong>{order.address}
+                                    </p>
+
+                                    <p className="text-sm text-gray-500">
+                                        <strong>Number: </strong>{order.number}
                                     </p>
 
                                     <p className="text-sm text-gray-500">

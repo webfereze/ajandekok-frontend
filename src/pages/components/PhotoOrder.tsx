@@ -7,7 +7,7 @@ import {TrashIcon, PencilSquareIcon, PlusIcon} from '@heroicons/react/24/outline
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
 import HeroImage2 from "@/assets/img/hero.png";
-import {Router, useRouter} from "next/router";
+import {useRouter} from "next/router";
 import {useTranslation} from "next-i18next";
 import useWindowDimensions from "@/pages/components/useMediaQuery";
 import * as process from "process";
@@ -31,6 +31,7 @@ export interface FormData {
     terms: boolean;
     email: string;
     address: string;
+    number: string;
     country: string;
     city: string;
     zip_code: string;
@@ -39,14 +40,10 @@ export interface FormData {
     shipping: string;
 }
 
-export interface AdminFormData {
-    email: string;
-    password: string;
-}
 
 export default function PhotoOrder() {
     const apiUrl = `${process.env.API_URL}/api/orders`;
-    const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number }[]>([]);
+    const [availableDimensions, setAvailableDimensions] = useState<{ id:number; dimension:string;price:number;deal:number }[]>([]);
     const [currentStep, setCurrentStep] = useState<CurrentStep>({step: 1});
     const { t } = useTranslation();
     const { isMobile } = useWindowDimensions();
@@ -60,6 +57,11 @@ export default function PhotoOrder() {
         formState: {errors},
     } = useForm<FormData>();
 
+    const [discountCoupon, setDiscountCoupon] = useState('');
+    const [couponApplied, setCouponApplied] = useState(false);
+    const [couponDetails, setCouponDetails] = useState(null);
+    const [shippingMethod, setShippingMethod] = useState<string>('personal');
+
     const onSubmit: SubmitHandler<FormData> = async (data) => {
 
 
@@ -69,11 +71,15 @@ export default function PhotoOrder() {
         formData.append('email', data.email);
         formData.append('zip_code', data.zip_code);
         formData.append('address', data.address);
+        formData.append('number', data.number);
         formData.append('country', data.country);
         formData.append('city', data.city);
         formData.append('phone', data.phone);
-        formData.append('shipping', data.shipping);
+        formData.append('shipping', shippingMethod);
         formData.append('details', data.details);
+        if(couponApplied && couponDetails ){
+            formData.append('coupon_id', parseInt(couponDetails.id as any));
+        }
 
         imageFields.forEach((image, index) => {
             if (image.file) {
@@ -182,7 +188,14 @@ export default function PhotoOrder() {
             return total;
         }, 0);
 
-        setTotalPrice(price);
+        if (shippingMethod == 'curier') {
+            setTotalPrice(price + 20);
+        }
+        else
+        {
+            setTotalPrice(price);
+        }
+
     };
     const returnDimensionNameById = (id:number) => {
         const selectedDimension = availableDimensions.find((dim: any) => dim.id == id);
@@ -208,7 +221,8 @@ export default function PhotoOrder() {
         if (availableDimensions) {
             const matchingObject = availableDimensions?.find((item: { id:number, price:number }) => item.id == id);
             if (matchingObject) {
-                return matchingObject?.price * quantity;
+                const totalPrice = (matchingObject?.price * quantity).toFixed(2);
+                return Number(totalPrice);
             } else {
                 return undefined; // Return undefined if dimension is not found
             }
@@ -223,6 +237,10 @@ export default function PhotoOrder() {
             setCurrentStep({step: 2});
         }
     }, [imageFields]);
+
+    useEffect(() => {
+        calculateTotalPrice();
+    }, [shippingMethod]);
 
     const saveImages = () => {
         const isAnyFileEmpty = imageFields.some((field) => !field.file);
@@ -249,7 +267,30 @@ export default function PhotoOrder() {
         }
     };
 
-    // @ts-ignore
+    const handleChangeDiscountCoupon = (value:string) => {
+        setDiscountCoupon(value);
+    }
+
+    const handleApplyDiscountCoupon = async () => {
+        let data = {
+            name: discountCoupon
+        };
+
+        try {
+            const response = await axios.post(`${process.env.API_URL}/api/coupons/check-existence`, data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setCouponApplied(true);
+            setCouponDetails(response.data.details);
+            calculateTotalPrice();
+        } catch (error) {
+            toast.error("Error processing your request.");
+        }
+    }
+
     return (
 
         <>
@@ -312,7 +353,7 @@ export default function PhotoOrder() {
                 <div className="container px-2 mx-auto my-10">
                     <h1 className="text-center text-secondary text-4xl font-bold mb-10" onClick={addImageField}>{t('descriptive.text.click.here')}</h1>
                     <div className="bg-background block md:grid grid-cols-3 p-10 w-full rounded-xl">
-                        <div className="bg-background col-span-2 rounded-xl py-5 px-5 cursor-pointer text-center">
+                        <div className="bg-background col-span-1 rounded-xl py-5 px-5 cursor-pointer text-center">
                             <Image className="mx-auto" src={GalleryIcon} alt="Ajandekok.ro | Gallery"/>
                             <p className="text-secondary text-xs pt-5 text-center">
                                 {t('descriptive.text.click.to.configure')}
@@ -325,17 +366,24 @@ export default function PhotoOrder() {
                                 {t('descriptive.text.start.configure')}
                             </div>
                         </div>
-                        <div className="text-right col-span-1 md:px-10">
+                        <div className="text-right col-span-2 md:px-10">
                             <h3 className="text-secondary text-center mb-5 font-bold text-xl">{t('descriptive.text.prices.title')}</h3>
                             <div className="grid grid-cols-2 gap-4 text-secondary">
                                 <p className="text-left">{t('descriptive.text.dimensions')}</p>
                                 <p>{t('descriptive.text.price')}</p>
                             </div>
                             <hr className="border-b my-5"/>
-                            {availableDimensions && availableDimensions.map((item: { id:number; dimension:string;price:number }) => (
-                                <div className="grid grid-cols-2 gap-4 text-secondary" key={item.id}>
-                                    <p className="text-left">{item.dimension}</p>
-                                    <p>{item.price} RON</p>
+                            {availableDimensions && availableDimensions.map((item: { id:number; dimension:string;price:number;deal:number }) => (
+                                <div className="grid grid-cols-2 gap-4 mb-2 text-secondary" key={item.id}>
+                                    <div className="flex items-center">
+                                        <p className="text-left">{item.dimension}</p>
+                                    </div>
+                                    <div className="flex justify-end">
+                                        {item.deal && <span className="px-1 flex items-center mr-2 bg-primary text-white rounded-full text-pico min-w-fit text-center ">{t('descriptive.text.prices.deal')}</span>}
+                                        <p>{item.price} RON</p>
+
+
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -524,15 +572,29 @@ export default function PhotoOrder() {
                                                 {errors.email && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.email.message}</p>}
                                             </div>
 
-                                            <div className="relative mb-10">
-                                                <label htmlFor="address" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.address')}</label>
-                                                <input
-                                                    type="text"
-                                                    id="address"
-                                                    {...register('address', {required: t('global.label.required'),})}
-                                                    className="border border-gray-300 rounded p-2 w-full"
-                                                />
-                                                {errors.address && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.address.message}</p>}
+                                            <div className="grid grid-cols-2 gap-3 mb-10">
+                                                <div className="relative">
+                                                    <label htmlFor="address" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.address')}</label>
+                                                    <input
+                                                        type="text"
+                                                        id="address"
+                                                        {...register('address', {required: t('global.label.required'),})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.address && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.address.message}</p>}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <label htmlFor="number" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm">{t('global.order.number')}</label>
+
+                                                    <input
+                                                        type="text"
+                                                        id="number"
+                                                        {...register('number', {required: t('global.label.required'),})}
+                                                        className="border border-gray-300 rounded p-2 w-full"
+                                                    />
+                                                    {errors.number && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.number.message}</p>}
+                                                </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-3 mb-10">
@@ -609,30 +671,20 @@ export default function PhotoOrder() {
 
                                             <div className="relative my-5 px-4 py-2 bg-background rounded-sm">
                                                 <label className="font-bold">{t('global.order.shipping')}</label>
-                                                <div className="relative flex flex-col text-secondary">
-                                                    <label>
-                                                        <input
-                                                            type="radio"
-                                                            checked={true}
-                                                            className="mr-2"
-                                                            value="personal"
-                                                            {...register('shipping', {required: t('global.order.shipping')})}
-                                                        />
-                                                        {t('global.personal.upload')}
 
-                                                    </label>
-                                                    <label>
-                                                        <input
-                                                            type="radio"
-                                                            className="mr-2"
-                                                            value="courier"
-                                                            {...register('shipping', {required: t('global.order.shipping')})}
-                                                        />
+                                                <div className="flex flex-wrap md:flex-nowrap justify-between cursor-pointer my-2 text-sm">
+                                                    <div  role="presentation" onClick={()=>setShippingMethod('personal')} className={`${shippingMethod== 'personal' ? '!bg-primary !text-white' : 'bg-white text-secondary' } flex items-center justify-center p-2 rounded-md w-full text-center`}>
+                                                        {t('global.personal.upload')}
+                                                    </div>
+
+                                                    <div
+                                                        role="presentation" onClick={()=>setShippingMethod('curier')}
+                                                        className={`${shippingMethod== 'curier' ? '!bg-primary !text-white' : 'bg-white text-secondary' } flex items-center justify-center p-2 rounded-md w-full text-center`}>
                                                         {t('global.curier.upload')}
-                                                    </label>
+                                                    </div>
                                                 </div>
-                                                {errors.shipping && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.shipping.message}</p>}
                                             </div>
+
 
                                             <div className="relative">
                                                 <div className="relative text-secondary">
@@ -695,10 +747,34 @@ export default function PhotoOrder() {
                                         ))}
                                     </div>
 
-                                    <div className="grid grid-cols-2 py-2 border-t border-b">
-                                        <div className="text-left font-bold">{t('global.billing.total')}</div>
-                                        <div className="text-right font-bold">{totalPrice.toFixed(2)} RON</div>
+                                    <div className="flex flex-col py-2 border-t border-b">
+                                        <div className="text-left font-bold">{t('global.billing.discount_coupon')}</div>
+                                        <div className="flex">
+                                            <input
+                                                type="text"
+                                                id="coupon_discount"
+                                                value={discountCoupon}
+                                                onChange = {(e)=>handleChangeDiscountCoupon(e.target.value)}
+                                                className="border border-gray-300 rounded p-2 w-64 mt-2"
+                                            />
+                                            <button className="font-semibold text-white bg-primary inline-block py-2 rounded-full px-5 text-sm ml-3 mt-2" onClick={handleApplyDiscountCoupon}> {t('button.coupon.apply')}</button>
+                                        </div>
+                                        {couponApplied && couponDetails && <span className="font-semibold text-green-500 mt-2 text-sm">{t('coupon.success.apply', { name: couponDetails.name, value: couponDetails.value })}</span>}
+                                        {couponApplied && !couponDetails && <span className="font-semibold text-primary mt-2 text-sm">{t('coupon.unsuccess.apply')}</span>}
                                     </div>
+
+
+
+                                    {couponApplied && couponDetails && <div className="grid grid-cols-2 pb-2">
+                                        <div className="text-left font-bold">{t('global.billing.discount')}</div>
+                                        <div className="text-right font-bold">{couponDetails.value}%</div>
+                                    </div>}
+
+                                    {<div className="grid grid-cols-2 py-2 border-b">
+                                        <div className="text-left font-bold">{t('global.billing.total_to_pay')}</div>
+                                        {/*<div className="text-right font-bold">{(totalPrice.toFixed(2) - (totalPrice.toFixed(2) * couponDetails.value/100)).toFixed(2)} RON</div>*/}
+                                        <div className="text-right font-bold">{totalPrice.toFixed(2)} RON</div>
+                                    </div>}
 
 
                                     <div className="text-center my-5">

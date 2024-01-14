@@ -33,6 +33,7 @@ export default function HeaderAdmin() {
                  <div>
                      <div className="items-center text-secondary hidden md:flex">
                          <Link className="cursor-pointer mr-4 " href="/admin">Orders</Link>
+                         <Link className="cursor-pointer mr-4 " href="/admin/coupons">Coupons</Link>
                          <Link className="cursor-pointer " href="/admin/canvas">Canvas settings</Link>
                          <button className="bg-primary text-surface px-4 py-2 rounded-sm ml-2" onClick={handleLogout}>Logout</button>
                      </div>
@@ -46,6 +47,7 @@ export default function HeaderAdmin() {
                      {isMobileMenuOpen && <>
                          <div className="block md:hidden fixed left-0 right-0 top-[50px] bg-white py-2 z-[9] shadow-md text-secondary px-4">
                              <Link className="cursor-pointer mr-4 block mb-3" href="/admin">Orders</Link>
+                             <Link className="cursor-pointer mr-4 block mb-3" href="/admin/coupons">Coupons</Link>
                              <Link className="cursor-pointer block mb-3 " href="/admin/canvas">Canvas settings</Link>
                              <button className="bg-primary text-surface px-4 py-2 rounded-sm " onClick={handleLogout}>Logout</button>
                          </div>
