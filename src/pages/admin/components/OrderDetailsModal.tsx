@@ -20,7 +20,7 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
         const newStatus = event.target.value;
         setSelectedStatus(newStatus);
         try {
-             const response = await axios.put(apiUrl, {status:parseInt(newStatus)}, {
+             const response = await axios.put(`${apiUrl}/${order.id}`, {status:parseInt(newStatus)}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -31,6 +31,7 @@ function OrderDetailsModal({ order, onClose, onFetch } : {order:any, onClose:any
         }
 
     };
+
 
     return (
         <div className="fixed z-10 inset-0 overflow-y-auto bg-gray-400 bg-opacity-70">

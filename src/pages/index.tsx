@@ -15,7 +15,7 @@ export default function Home() {
       <>
         <Head>
           <title>
-            PozaCanvas.ro | Part of Ajandekok.ro
+            PozaCanvas.ro | Part of ©️KOLpic
           </title>
           <meta
               name="description"

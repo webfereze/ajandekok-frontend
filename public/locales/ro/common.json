@@ -1,7 +1,9 @@
 {
   "hero.title": "Prelucrare foto premium",
-  "hero.description": "Bine ați venit în magazinul nostru online de comenzi pentru tablouri pe pânză, unde puteți descoperi cât de impresionante pot fi tablourile imprimate pe pânză în propria dumneavoastră casă sau ca dar. Aveți încredere în noi, deoarece tabloul comandat de la noi reprezintă cea mai înaltă calitate, și suntem flexibili pentru a satisface toate cerințele dumneavoastră.",
-  "hero.description.2": "Organizați-le în rame foto sau albume foto pentru a crea amintiri de neuitat pentru întreaga familie!",
+  "hero.description": "Bine ai venit la KOLpicSHOP, lumea captivantă a tablourilor pe pânză personalizate! Descoperă posibilitățile uimitoare care te ajută să îți înveselești casa sau să oferi cadoul perfect, simplu ca niciodată.",
+  "hero.description1": "Ai încredere în noi, deoarece tablourile pe pânză pe care le comanzi de la noi garantează cea mai înaltă calitate, iar flexibilitatea noastră asigură satisfacerea tuturor cerințelor tale unice.",
+  "hero.description2": "Realizăm tablouri pe pânză folosind propriile tale fotografii, cu o garanție maximă de satisfacție și chiar cu posibilitatea de livrare gratuită la domiciliu.",
+  "hero.description3": "Înfrumusețează-ți pereții cu un strop de viață nouă!",
   "hero.copyright": "pentru a retrăi momentele memorabile!\n",
   "button.try": "Încearcă",
   "button.order": "Comandă",
@@ -53,5 +55,6 @@
   "global.order.details": "Mentiuni",
   "global.order.zip": "Cod poștal",
   "global.label.required": "Vă rugăm să completați acest câmp.",
-  "global.fields.required": "Vă rugăm să parcurgeți toți pașii necesari."
+  "global.fields.required": "Vă rugăm să parcurgeți toți pașii necesari.",
+  "global.fields.required.image": "Vă rugăm să adaugati o image de procesat."
 }

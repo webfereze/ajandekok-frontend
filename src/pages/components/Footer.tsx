@@ -3,11 +3,11 @@ import LogoWhite from "@/assets/img/logo-white.svg";
 import Anpc from "@/assets/img/anpc.png";
 import Litigi from "@/assets/img/litigi.png";
 import React from "react";
+import {useRouter} from "next/router";
 
 export default function Footer() {
-
+const { locale} = useRouter();
   return (
-
       <header className="bg-secondary py-10">
           <div className="container mx-auto">
               <div className="block md:grid grid-cols-3">
@@ -49,11 +49,24 @@ export default function Footer() {
                   </div>
 
                   <div className="text-center">
-                      <a className="block text-background text-sm mb-2" href="https://www.ajandekok.ro/rolunk">Tudj meg többet rólunk</a>
-                      <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/termeni-si-conditii/">Általános Szerződési Feltételek</a>
-                      <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/politica-de-confidentialitate/">Adatkezelési tájékoztató</a>
-                      <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/garancia/">Garancia</a>
-                      <span className="text-primary text-sm text-center">@copyright 2023. All rights reserved</span>
+
+                      { locale == 'ro' && <div>
+                          <a className="block text-background text-sm mb-2" href="https://www.ajandekok.ro/rolunk">Alfa mai multe</a>
+                          <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/termeni-si-conditii/">Termeni si conditii</a>
+                          <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/politica-de-confidentialitate/">Politica de confidentialitate</a>
+                          <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/garancia/">Garantie</a>
+                      </div>
+                      }
+
+                      { locale == 'hu' && <div>
+                          <a className="block text-background text-sm mb-2" href="https://www.ajandekok.ro/rolunk">Tudj meg többet rólunk</a>
+                          <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/termeni-si-conditii/">Általános Szerződési Feltételek</a>
+                          <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/politica-de-confidentialitate/">Adatkezelési tájékoztató</a>
+                          <a className="block text-background text-sm mb-2" href="https://ajandekok.ro/garancia/">Garancia</a>
+                      </div>
+                      }
+
+                      <span className="text-primary text-sm text-center">@copyright 2024. All rights reserved | ©️KOLpic</span>
                   </div>
 
                   <div className="text-center md:text-right flex flex-col items-center md:items-end mt-2 md:mt-0">

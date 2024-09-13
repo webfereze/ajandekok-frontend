@@ -6,19 +6,15 @@ import LogoImage from "../../../assets/img/logo.png"
 import Image from "next/image";
 import {useDispatch, useSelector} from "react-redux";
 import {setUser} from "@/userManagement/userSlice";
-import {AdminFormData} from "@/pages/components/PhotoOrder";
 import toast, {Toaster} from "react-hot-toast";
 
-
-
-// const { t } = useTranslation('common');
 
 export default function Login() {
     const user = useSelector((state: any) => state.user);
     const {token} = user;
     const router = useRouter();
     const dispatch = useDispatch();
-    const { register, handleSubmit, formState: { errors } } = useForm<AdminFormData>();
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     useEffect(() => {
         if (token) {router.push('/admin')}
@@ -39,6 +35,8 @@ export default function Login() {
         }
     };
 
+    // @ts-ignore
+    // @ts-ignore
     // @ts-ignore
     // @ts-ignore
     // @ts-ignore
@@ -71,7 +69,7 @@ export default function Login() {
                                 })}
                                 className="border text-secondary border-gray-300 rounded p-2 w-full"
                             />
-                            {errors.email && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.email.message}</p>}
+                            {errors.email && <p className="text-error text-xs absolute -bottom-5 left-2">{errors.email.message as string}</p>}
                         </div>
                         <div className="relative my-7">
                             <label htmlFor="email" className="absolute left-0 ml-1 -translate-y-3 bg-white px-1 text-sm duration-100 ease-linear peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:text-sm text-secondary">Password</label>
@@ -85,7 +83,7 @@ export default function Login() {
                                 className="border text-secondary border-gray-300 rounded p-2 w-full"
                             />
                             {errors.password && <p className="text-error text-xs absolute -bottom-5 left-2">
-                                {errors.password.message}
+                                {errors.password.message as string}
                             </p>}
                         </div>
                         <div className="pt-10">

@@ -2,6 +2,7 @@ import { Html, Head, Main, NextScript } from 'next/document'
 import React from "react";
 import {useSelector} from "react-redux";
 import {useRouter} from "next/router";
+import Script from "next/script";
 
 export default function Document() {
 
@@ -11,7 +12,7 @@ export default function Document() {
         <Head>
             <link rel='icon' href='favicon.ico'/>
                 <title>
-                    PozaCanvas.ro | Part of Ajandekok.ro
+                    PozaCanvas.ro | Part of ©️KOLpic
                 </title>
                 <meta
                     name="description"

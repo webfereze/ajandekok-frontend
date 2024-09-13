@@ -16,6 +16,13 @@
   }
 }
 
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 #__next {
   min-height: 100vh;
   display: flex;

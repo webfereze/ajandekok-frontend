@@ -40,6 +40,14 @@ export interface FormData {
     shipping: string;
 }
 
+interface CouponDetailsInterface {
+    id: number;
+    name: string;
+    value: number;
+    active: boolean;
+    qty: number;
+}
+
 
 export default function PhotoOrder() {
     const apiUrl = `${process.env.API_URL}/api/orders`;
@@ -59,7 +67,7 @@ export default function PhotoOrder() {
 
     const [discountCoupon, setDiscountCoupon] = useState('');
     const [couponApplied, setCouponApplied] = useState(false);
-    const [couponDetails, setCouponDetails] = useState(null);
+    const [couponDetails, setCouponDetails] = useState<CouponDetailsInterface>();
     const [shippingMethod, setShippingMethod] = useState<string>('personal');
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
@@ -78,7 +86,8 @@ export default function PhotoOrder() {
         formData.append('shipping', shippingMethod);
         formData.append('details', data.details);
         if(couponApplied && couponDetails ){
-            formData.append('coupon_id', parseInt(couponDetails.id as any));
+            // @ts-ignore
+            formData.append('coupon_id', parseInt(couponDetails.id));
         }
 
         imageFields.forEach((image, index) => {
@@ -180,6 +189,7 @@ export default function PhotoOrder() {
 
     // Function to calculate the total price
     const calculateTotalPrice = () => {
+        // Calculate price for canvases
         const price = imageFields.reduce((total, field) => {
             const selectedDimension = availableDimensions.find((dim: any) => dim.id == field.dimensions);
             if (selectedDimension) {
@@ -188,13 +198,21 @@ export default function PhotoOrder() {
             return total;
         }, 0);
 
+        let finalPrice = price;
+
+        // Apply coupon if needed
+        if (couponDetails && couponDetails.value) {
+            const discountAmount = (finalPrice * couponDetails.value) / 100;
+            const discountedTotalPrice = finalPrice - discountAmount;
+            finalPrice = discountedTotalPrice;
+        }
+
+        // Apply shipping if Needed ( Discount does not apply on shipping)
         if (shippingMethod == 'curier') {
-            setTotalPrice(price + 20);
+            finalPrice = finalPrice + 20;
         }
-        else
-        {
-            setTotalPrice(price);
-        }
+
+        setTotalPrice(finalPrice);
 
     };
     const returnDimensionNameById = (id:number) => {
@@ -231,16 +249,7 @@ export default function PhotoOrder() {
 
     useEffect(() => {
         calculateTotalPrice();
-        if (imageFields.length == 0) {
-            setCurrentStep({step: 1});
-        } else {
-            setCurrentStep({step: 2});
-        }
-    }, [imageFields]);
-
-    useEffect(() => {
-        calculateTotalPrice();
-    }, [shippingMethod]);
+    }, [shippingMethod, imageFields, couponDetails]);
 
     const saveImages = () => {
         const isAnyFileEmpty = imageFields.some((field) => !field.file);
@@ -248,7 +257,7 @@ export default function PhotoOrder() {
         if (isAnyFileEmpty) {
             const updatedFields = imageFields.map((field) => ({
                 ...field,
-                error: field.file ? '' : 'File is required',
+                error: field.file ? '' : t('global.fields.required.image'),
             }));
             setImageFields(updatedFields);
             toast.error(t('global.fields.required'));
@@ -303,18 +312,20 @@ export default function PhotoOrder() {
                             className={`text-white bg-primary  w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer ml-0 z-[2]`}>1</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.1')}</p>
                     </div>
-                    <div className="text-center flex flex-col" onClick={addImageField}>
+                    <div
+                        role="presentation"
+                        className="text-center flex flex-col"
+                         onClick={() => imageFields.length === 0 ? (addImageField(), setCurrentStep({ step: 2 })) : setCurrentStep({ step: 2 })}
+                    >
                         <span
                             className={`${currentStep.step > 1 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex mx-auto items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>2</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.2')}</p>
                     </div>
-                    <div onClick={()=> toast.error("Complete the details please.")} className="text-center flex flex-col">
+                    <div className="text-center flex flex-col">
                         <span
                             className={`${currentStep.step > 2 ? 'text-white bg-primary' : 'text-secondary bg-surface'} w-8 h-8 flex ml-auto mr-0 items-center justify-center border-primary border-2 rounded-full cursor-pointer z-[2]`}>3</span>
                         <p className="text-pico md:text-sm text-secondary font-semibold mt-1">{t('global.step.3')}</p>
                     </div>
-
-
                 </div>
             </div>
 
@@ -329,17 +340,17 @@ export default function PhotoOrder() {
                         <h1 className="text-left text-4xl font-bold ">
                             {t('hero.title')}</h1>
 
-                        <span className="text-xs block">Part of <a href="https://www.ajandekok.ro" className="text-primary font-semibold">ajandekok.ro</a> KolPicShop.</span>
+                        <span className="text-xs block">Part of ©️KOLpic </span>
 
                         <div className="py-5 text-md">
 
-                            <p>{t('hero.description')}</p>
+                            <h2>{t('hero.description')}</h2>
+                            <p className="mb-2">{t('hero.description1')}</p>
+                            <p className="mb-2">{t('hero.description2')}</p>
+                            <p className="mb-2">{t('hero.description3')}</p>
                         </div>
-                        <p className="text-md">
-                            {t('hero.description.2')}
-                        </p>
                         <div
-                            onClick={addImageField} role="presentation"
+                            onClick={() => imageFields.length === 0 ? (addImageField(), setCurrentStep({ step: 2 })) : setCurrentStep({ step: 2 })}
                             className="bg-primary w-full md:w-fit inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
                             {t('button.try')}
                         </div>
@@ -361,7 +372,7 @@ export default function PhotoOrder() {
                             <p className="text-lightGrey text-xs py-2">JPG/TIF, min 700x700 px, max 3000x3000 px,
                                 max 2MB</p>
                             <div
-                                onClick={addImageField} role="presentation"
+                                onClick={() => imageFields.length === 0 ? (addImageField(), setCurrentStep({ step: 2 })) : setCurrentStep({ step: 2 })}
                                 className="bg-primary inline-block text-white text-center py-2 px-5 rounded-full mt-5 cursor-pointer">
                                 {t('descriptive.text.start.configure')}
                             </div>
@@ -374,15 +385,13 @@ export default function PhotoOrder() {
                             </div>
                             <hr className="border-b my-5"/>
                             {availableDimensions && availableDimensions.map((item: { id:number; dimension:string;price:number;deal:number }) => (
-                                <div className="grid grid-cols-2 gap-4 mb-2 text-secondary" key={item.id}>
+                                <div className="grid grid-cols-2 gap-4 pb-2 mb-2 border-b text-secondary" key={item.id}>
                                     <div className="flex items-center">
                                         <p className="text-left">{item.dimension}</p>
                                     </div>
                                     <div className="flex justify-end">
-                                        {item.deal && <span className="px-1 flex items-center mr-2 bg-primary text-white rounded-full text-pico min-w-fit text-center ">{t('descriptive.text.prices.deal')}</span>}
+                                        {(item.deal || item.deal !==0) && <span className="px-3 flex items-center mr-2 bg-primary text-white rounded-full text-pico min-w-fit text-center ">{t('descriptive.text.prices.deal')}</span>}
                                         <p>{item.price} RON</p>
-
-
                                     </div>
                                 </div>
                             ))}
@@ -391,16 +400,16 @@ export default function PhotoOrder() {
                 </div>
             }
 
-
             {currentStep.step == 2 && imageFields.length > 0 &&
                 <div className="container mx-auto">
                     <h1 className="text-3xl text-secondary text-center my-5 font-bold ">{t('global.photo.order.text')}</h1>
                     <div className="block md:grid grid-cols-3 lg:grid-cols-4 gap-4 mt-10 mb-20">
                         {imageFields.map((field:any, index) => (
                             <div key={index}
-                                 className="relative bg-background rounded-xl mb-10 border border-y-4 py-5 px-5 cursor-pointer text-center text-secondary flex flex-col justify-between">
+                                 className={`${field.error ? 'border-error' : ''} ${field.previewURL ? 'border-green-500' : ''} 
+                                 relative bg-background rounded-xl mb-10 border border-y-4 py-5 px-5 cursor-pointer text-center text-secondary flex flex-col justify-between`}
+                               >
                                 <div>
-
                                     <div>
                                         {field.previewURL && (
                                             <div className="relative w-32 h-32 mb-5  mx-auto">
@@ -493,7 +502,7 @@ export default function PhotoOrder() {
                                     </div>
 
                                     {field.error &&
-                                        <p className="text-white bg-primary text-sm">{field.error}</p>}
+                                        <p className="text-white bg-primary text-sm rounded-md">{field.error}</p>}
                                 </div>
 
                             </div>
@@ -747,23 +756,21 @@ export default function PhotoOrder() {
                                         ))}
                                     </div>
 
-                                    <div className="flex flex-col py-2 border-t border-b">
+                                    <div className="flex flex-col py-6 border-t border-b relative">
                                         <div className="text-left font-bold">{t('global.billing.discount_coupon')}</div>
-                                        <div className="flex">
+                                        <div className={`${couponApplied && couponDetails ? 'disabled opacity-60 pointer-events-none' : ''} flex items-center`}>
                                             <input
                                                 type="text"
                                                 id="coupon_discount"
                                                 value={discountCoupon}
                                                 onChange = {(e)=>handleChangeDiscountCoupon(e.target.value)}
-                                                className="border border-gray-300 rounded p-2 w-64 mt-2"
+                                                className="border border-gray-300 rounded p-2 w-full mt-2"
                                             />
-                                            <button className="font-semibold text-white bg-primary inline-block py-2 rounded-full px-5 text-sm ml-3 mt-2" onClick={handleApplyDiscountCoupon}> {t('button.coupon.apply')}</button>
+                                            <button className={`font-semibold text-white bg-primary inline-block py-2 rounded-full px-2 text-sm ml-3 mt-2`} onClick={handleApplyDiscountCoupon}> {t('button.coupon.apply')}</button>
                                         </div>
-                                        {couponApplied && couponDetails && <span className="font-semibold text-green-500 mt-2 text-sm">{t('coupon.success.apply', { name: couponDetails.name, value: couponDetails.value })}</span>}
+                                        {couponApplied && couponDetails && <span className="font-normal text-green-500 mt-2 text-sm">{t('coupon.success.apply', { name: couponDetails.name, value: couponDetails.value })}</span>}
                                         {couponApplied && !couponDetails && <span className="font-semibold text-primary mt-2 text-sm">{t('coupon.unsuccess.apply')}</span>}
                                     </div>
-
-
 
                                     {couponApplied && couponDetails && <div className="grid grid-cols-2 pb-2">
                                         <div className="text-left font-bold">{t('global.billing.discount')}</div>
@@ -772,7 +779,6 @@ export default function PhotoOrder() {
 
                                     {<div className="grid grid-cols-2 py-2 border-b">
                                         <div className="text-left font-bold">{t('global.billing.total_to_pay')}</div>
-                                        {/*<div className="text-right font-bold">{(totalPrice.toFixed(2) - (totalPrice.toFixed(2) * couponDetails.value/100)).toFixed(2)} RON</div>*/}
                                         <div className="text-right font-bold">{totalPrice.toFixed(2)} RON</div>
                                     </div>}
 
@@ -791,21 +797,28 @@ export default function PhotoOrder() {
 
             <div
                 className={`${ currentStep.step === 2 ? 'block md:flex opacity-100' : 'hidden opacity-0' }  text-center bg-background border-t shadow-md py-5 justify-between md:text-right px-10`}>
-                <div className="text-secondary text-left mb-3 md:mb-0 flex items-center">
+                <div className="text-secondary text-left mb-3 md:mb-0 flex items-center ">
+
                     <div>
-                        {t('global.billing.total')}: <strong>RON: {totalPrice.toFixed(2)}</strong>
+                        <div>
+                            {t('global.billing.total')}: <strong>RON: {totalPrice.toFixed(2)}</strong>
+                        </div>
+                        {couponApplied && couponDetails && <div className="">
+                            <div className="text-left font-semibold text-sm text-green-500">{t('global.billing.discount')}:{couponDetails.value}%</div>
+                        </div>}
                     </div>
+
                 </div>
 
                 {currentStep.step === 1 &&
                     <div onClick={addImageField} role="presentation"
-                         className="font-semibold bg-primary inline-block py-4 rounded-full px-5 text-sm">
+                         className="font-semibold bg-primary flex items-center py-4 rounded-full px-5 text-sm">
                         {t('global.config')}
                     </div>}
 
                 {currentStep.step === 2 &&
                     <div onClick={() => saveImages()}
-                         className="font-semibold bg-primary inline-block py-2 rounded-full px-5 text-sm cursor-pointer">  {t('global.finish')}
+                         className="font-semibold bg-primary flex items-center py-2 rounded-full px-5 text-sm cursor-pointer">  {t('global.finish')}
                     </div>}
 
             </div>
